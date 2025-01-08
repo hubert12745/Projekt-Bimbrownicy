@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtry</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, select, button {
+            padding: 8px;
+            margin-top: 5px;
+            font-size: 14px;
+            width: 100%;
+            max-width: 300px;
+        }
+        button {
+            width: auto;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+<h1>Filtry</h1>
+<form method="POST" action="filtry.php">
+    <label for="wydzial">Wydział:</label>
+    <input type="text" id="wydzial" name="wydzial" placeholder="np. WIEiT">
+
+    <label for="wykladowca">Wykładowca:</label>
+    <input type="text" id="wykladowca" name="wykladowca" placeholder="np. Dr. Kowalski">
+
+    <label for="sala">Sala:</label>
+    <input type="text" id="sala" name="sala" placeholder="np. A101">
+
+    <label for="przedmiot">Przedmiot:</label>
+    <input type="text" id="przedmiot" name="przedmiot" placeholder="np. Matematyka">
+
+    <label for="grupa">Grupa:</label>
+    <input type="text" id="grupa" name="grupa" placeholder="np. 1A">
+
+    <label for="numer_albumu">Numer albumu studenta:</label>
+    <input type="text" id="numer_albumu" name="numer_albumu" placeholder="np. 123456">
+
+    <label for="forma_przedmiotu">Forma przedmiotu:</label>
+    <input type="text" id="forma_przedmiotu" name="forma_przedmiotu" placeholder="np. Wykład">
+
+    <label for="typ_studiow">Typ studiów:</label>
+    <select id="typ_studiow" name="typ_studiow">
+        <option value="">-- Wybierz typ studiów --</option>
+        <option value="Stacjonarne">Stacjonarne</option>
+        <option value="Niestacjonarne">Niestacjonarne</option>
+    </select>
+
+    <label for="semestr">Semestr studiów:</label>
+    <input type="number" id="semestr" name="semestr" placeholder="np. 1" min="1" max="10">
+
+    <label for="rok_studiow">Rok studiów:</label>
+    <input type="number" id="rok_studiow" name="rok_studiow" placeholder="np. 1" min="1" max="5">
+
+    <button type="submit">Filtruj</button>
+</form>
+</body>
+</html>
