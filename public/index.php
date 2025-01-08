@@ -7,36 +7,36 @@ $templating = new \App\Service\Templating();
 $router = new \App\Service\Router();
 
 $action = $_REQUEST['action'] ?? null;
+$view = null;
+
 switch ($action) {
-    case 'post-index':
-    case null:
-        $controller = new \App\Controller\PostController();
+    case 'schedule-index':
+        $controller = new \App\Controller\ScheduleController();
         $view = $controller->indexAction($templating, $router);
         break;
-    case 'post-create':
-        $controller = new \App\Controller\PostController();
-        $view = $controller->createAction($_REQUEST['post'] ?? null, $templating, $router);
-        break;
-    case 'post-edit':
-        if (! $_REQUEST['id']) {
-            break;
+    case 'schedule-show':
+        if (isset($_REQUEST['id'])) {
+            $controller = new \App\Controller\ScheduleController();
+            $view = $controller->showAction((int)$_REQUEST['id'], $templating, $router);
+        } else {
+            throw new NotFoundException("Missing schedule ID");
         }
-        $controller = new \App\Controller\PostController();
-        $view = $controller->editAction($_REQUEST['id'], $_REQUEST['post'] ?? null, $templating, $router);
         break;
-    case 'post-show':
-        if (! $_REQUEST['id']) {
-            break;
-        }
-        $controller = new \App\Controller\PostController();
-        $view = $controller->showAction($_REQUEST['id'], $templating, $router);
+    case 'schedule-create':
+        $controller = new \App\Controller\ScheduleController();
+        $view = $controller->createAction($_REQUEST['schedule'] ?? null, $templating, $router);
         break;
-    case 'post-delete':
-        if (! $_REQUEST['id']) {
-            break;
+    case 'schedule-edit':
+        if (isset($_REQUEST['id'])) {
+            $controller = new \App\Controller\ScheduleController();
+            $view = $controller->editAction((int)$_REQUEST['id'], $_REQUEST['schedule'] ?? null, $templating, $router);
         }
-        $controller = new \App\Controller\PostController();
-        $view = $controller->deleteAction($_REQUEST['id'], $router);
+        break;
+    case 'schedule-delete':
+        if (isset($_REQUEST['id'])) {
+            $controller = new \App\Controller\ScheduleController();
+            $view = $controller->deleteAction((int)$_REQUEST['id'], $router);
+        }
         break;
     case 'info':
         $controller = new \App\Controller\InfoController();
