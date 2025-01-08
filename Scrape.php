@@ -15,7 +15,7 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $scrapeData = new \App\Service\ScrapeData($pdo);
     $department = 'WI';
-    $scrapeData->scrapeData($department);
+    $scrapeData->fetchData($department);
 
     echo "Data scraped and inserted successfully.";
 } catch (PDOException $e) {
