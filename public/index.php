@@ -11,6 +11,7 @@ $view = null;
 
 switch ($action) {
     case 'schedule-index':
+    case null:
         $controller = new \App\Controller\ScheduleController();
         $view = $controller->indexAction($templating, $router);
         break;
