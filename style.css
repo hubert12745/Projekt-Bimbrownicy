@@ -1,0 +1,277 @@
+/* RESET i PODSTAWY */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Tło przeglądarki i centrowanie głównego kontenera */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* 100% wysokości okna */
+    background-color: #f4f4f4;
+}
+
+/* Główny kontener: sidebar + main */
+.container {
+    display: flex;
+    width: 90%;
+    height: 90vh;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* --- SIDEBAR --- */
+.sidebar {
+    width: 20%;
+    background-color: #f9f9f9;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* wyrównanie przycisków do lewej */
+    position: relative; /* aby .filters mogła być absolutnie w tym obszarze */
+    padding: 10px;
+}
+
+/* Przykładowe przyciski w sidebarze */
+.button {
+    width: 90%;
+    padding: 15px;
+    margin: 10px 0;
+    background-color: #ddd;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+}
+.button:hover {
+    background-color: #bbb;
+}
+
+/* PANEL FILTRÓW (nakrywający sidebar) */
+.filters {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;  /* wypełnia całą wysokość sidebaru */
+    background-color: #fff;
+    z-index: 999;  /* nakrywa normalny sidebar */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+    /* Domyślnie ukryty */
+    display: none;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto; /* w razie dużej liczby filtrów */
+}
+
+/* Gdy klasa .active jest dodana przez JS, panel się pojawia */
+.filters.active {
+    display: flex;
+}
+
+/* Przycisk wewnątrz panelu filtrów do zamykania */
+.close-button {
+    background-color: #ddd;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+.close-button:hover {
+    background-color: #bbb;
+}
+
+/* Pojedyncze "pola" filtrów */
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+.form-group input[type="text"]:hover,
+.form-group input[type="text"]:focus {
+    border-color: #999;
+}
+
+/* Przyciski na dole panelu filtrów */
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+.filter-buttons button {
+    background-color: #ddd;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.filter-buttons button:hover {
+    background-color: #bbb;
+    color: #fff;
+}
+
+/* --- SEKCJA .main (zawiera header i kalendarz) --- */
+.main {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Pasek nawigacji (góra) */
+.header {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-button {
+    padding: 8px 15px;
+    background-color: #ddd;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.nav-button:hover {
+    background-color: #bbb;
+}
+
+/* Przyciski widoku */
+.view-buttons {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+}
+.view-button {
+    padding: 8px 15px;
+    background-color: #ddd;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.view-button:hover {
+    background-color: #bbb;
+}
+
+/* Kontener na tabelę */
+.schedule-container {
+    flex: 1;                  /* wypełnia resztę pionowo */
+    display: flex;
+    flex-direction: column;
+    background-color: #e0e0e0;
+    overflow: auto;           /* scroll, gdy treść wysoka */
+    padding: 10px;
+}
+
+/* Tabela z planem */
+.schedule-table {
+    flex: 1;                  /* pozwala rozciągać w pionie */
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+}
+
+/* Nagłówki (dni tygodnia + kolumna godzin) */
+.schedule-table thead th {
+    background-color: #eee;
+    text-align: center;
+    padding: 8px;
+    border: 1px solid #ccc;
+    font-weight: bold;
+}
+
+/* Pierwsza kolumna: godzina */
+.schedule-table thead th:first-child,
+.schedule-table tbody td:first-child {
+    border-right: 2px solid #ccc;
+    text-align: center;
+    width: 50px;
+}
+
+/* Wiersze godzin (7..19) => 60px/1h */
+.schedule-table tbody tr {
+    height: 60px;
+}
+
+/* Komórki w tabeli */
+.schedule-table tbody td {
+    border: 1px dotted #ccc;
+    position: relative; /* aby .event-block można było absolute w środku */
+    vertical-align: top;
+}
+
+/* Legenda */
+.legend {
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    font-size: 14px;
+    background-color: #fafafa;
+}
+
+/* Kropki w legendzie */
+.dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 5px;
+    border-radius: 50%;
+}
+
+/* Blok wydarzenia – pozycja absolute w .td */
+.event-block {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    padding: 3px 6px;
+    color: #fff;
+    font-size: 12px;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+/* Przykładowe kolory dla rodzajów zajęć */
+.lab {
+    background-color: #2ecc71;
+}
+.wyklad {
+    background-color: #3498db;
+}
+.lektorat {
+    background-color: #e67e22;
+}
+.projekt {
+    background-color: #16a085;
+}
+.audytoryjne {
+    background-color: #8e44ad;
+}
+.egzamin {
+    background-color: #2980b9;
+}

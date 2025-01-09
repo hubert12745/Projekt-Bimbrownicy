@@ -1,3 +1,13 @@
+DROP TABLE IF EXISTS Wydzial;
+DROP TABLE IF EXISTS Sala_z_budynkiem;
+DROP TABLE IF EXISTS Tok_studiow;
+DROP TABLE IF EXISTS Przedmiot;
+DROP TABLE IF EXISTS Grupa;
+DROP TABLE IF EXISTS Student;
+DROP TABLE IF EXISTS Grupa_Student;
+DROP TABLE IF EXISTS Wykladowca;
+DROP TABLE IF EXISTS Zajecia;
+
 CREATE TABLE Wydzial (
                          id INTEGER PRIMARY KEY AUTOINCREMENT,
                          nazwa TEXT NOT NULL,
@@ -62,6 +72,7 @@ CREATE TABLE Zajecia (
                          tok_studiow_id INTEGER NOT NULL,
                          sala_id INTEGER NOT NULL,
                          przedmiot_id INTEGER NOT NULL,
+                         semestr INTEGER NOT NULL,
                          FOREIGN KEY (wykladowca_id) REFERENCES Wykladowca(id),
                          FOREIGN KEY (wydzial_id) REFERENCES Wydzial(id),
                          FOREIGN KEY (grupa_id) REFERENCES Grupa(id),
