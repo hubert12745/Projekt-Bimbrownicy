@@ -14,10 +14,12 @@ ob_start(); ?>
             <button class="button" id="showFiltersBtn">Pokaż filtry</button>
 
             <!-- Przyciski normalnie widoczne -->
-            <button class="button">ULUBIONE</button>
+
+            <button class="button" id="showFavouritesBtn">ULUBIONE </button>
             <button class="button">STATYSTYKI</button>
 
             <!-- PANEL FILTRÓW nakrywający -->
+
             <div class="filters" id="filters">
                 <!-- Przycisk do chowania filtrów -->
                 <button class="close-button" id="closeFiltersBtn">Ukryj filtry</button>
@@ -67,9 +69,17 @@ ob_start(); ?>
                 <div class="filter-buttons">
                     <button type="reset">Resetuj filtry</button>
                     <button type="button">Zastosuj filtry</button>
-                    <button type="button">Wyszukaj</button>
+
                 </div>
             </div>
+            <div class="filters" id="favourites">
+
+                <button class="close-button" id="closeFavouritesBtn">Ukryj ulubione</button>
+                <ul id="buttonList">
+
+                </ul>
+            </div>
+
         </div>
 
         <!-- Główna część (header + tabela) -->
@@ -80,6 +90,7 @@ ob_start(); ?>
                     <button class="nav-button" id="prevWeekBtn">&lt; Poprzedni</button>
                     <button class="nav-button" id="nextWeekBtn">Następny &gt;</button>
                     <button class="nav-button" id="addEventBtn">Dodaj zajęcia</button>
+                    <button class="nav-button" id="addFavourtiesBtn">&lt;3</button>
                     <div class="view-buttons">
                         <button class="view-button">Semestr</button>
                         <button class="view-button">Miesiąc</button>

@@ -5,7 +5,16 @@
     box-sizing: border-box;
     font-family: Arial, sans-serif;
 }
+/* --- ULUBIONE --- */
 
+.favourites {
+    display: none;
+}
+
+/* Gdy klasa .active jest dodana przez JS, panel się pojawia */
+.favourites.active {
+    display: block;
+}
 /* Tło przeglądarki i centrowanie głównego kontenera */
 body {
     display: flex;
