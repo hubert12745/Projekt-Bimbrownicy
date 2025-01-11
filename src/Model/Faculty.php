@@ -65,9 +65,8 @@ class Faculty
     public function save($facultyId, $facultyName, $facultyShort)
     {
         $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT INTO Faculty (faculty_id, faculty_name, faculty_short) VALUES (:faculty_id, :faculty_name, :faculty_short)');
+        $stmt = $pdo->prepare('INSERT INTO Faculty ( faculty_name, faculty_short) VALUES (:faculty_name, :faculty_short)');
         $stmt->execute([
-            'faculty_id' => $facultyId,
             'faculty_name' => $facultyName,
             'faculty_short' => $facultyShort
         ]);

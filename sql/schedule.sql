@@ -67,7 +67,7 @@ CREATE TABLE Lesson
 
 CREATE TABLE Student
 (
-    student_id INTEGER PRIMARY KEY AUTOINCREMENT
+    student_id INTEGER PRIMARY KEY
 );
 
 CREATE TABLE StudentGroup
