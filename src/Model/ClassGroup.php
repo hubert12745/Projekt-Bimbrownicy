@@ -3,10 +3,11 @@
 namespace App\Model;
 
 use App\Service\Config;
+use PDO;
 
 class ClassGroup
 {
-    private ?int $groupId;
+    private ?int $groupId = null;
     private ?string $groupName;
     private ?int $semester;
     private ?int $facultyId;
@@ -81,12 +82,11 @@ class ClassGroup
 
     public function fill($array): ClassGroup
     {
-        foreach ($array as $key => $value) {
-            $method = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-            if (method_exists($this, $method)) {
-                $this->$method($value);
-            }
-        }
+        $this->setGroupName($array['group_name']);
+        $this->setSemester($array['semestr']);
+        $this->setFacultyId($array['faculty_id']);
+        $this->setDepartment($array['department']);
+        $this->setFieldOfStudy($array['field_of_study']);
 
         return $this;
     }
@@ -97,10 +97,10 @@ class ClassGroup
 
         return $classGroup;
     }
-    public function save($groupId, $groupName, $semester, $facultyId, $department, $fieldOfStudy)
+    public function save($groupName, $semester, $facultyId, $department, $fieldOfStudy)
     {
         $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT INTO ClassGroup (group_id, group_name, semester, faculty_id, department, field_of_study) VALUES (:group_id, :group_name, :semester, :faculty_id, :department, :field_of_study)');
+        $stmt = $pdo->prepare('INSERT INTO ClassGroup (group_name, semester, faculty_id, department, field_of_study) VALUES (:group_name, :semester, :faculty_id, :department, :field_of_study)');
         $stmt->execute([
             'group_name' => $groupName,
             'semester' => $semester,

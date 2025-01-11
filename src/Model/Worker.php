@@ -12,7 +12,7 @@ class Worker
     private ?string $lastName;
     private ?string $fullName;
     private ?string $login;
-    private ?int $factoryId;
+    private ?int $facultyId;
 
     public function getWorkerId(): ?int
     {
@@ -79,14 +79,14 @@ class Worker
         return $this;
     }
 
-    public function getFactoryId(): ?int
+    public function getFacultyId(): ?int
     {
-        return $this->factoryId;
+        return $this->facultyId;
     }
 
-    public function setFactoryId(?int $factoryId): Worker
+    public function setFacultyId(?int $facultyId): Worker
     {
-        $this->factoryId = $factoryId;
+        $this->facultyId = $facultyId;
         return $this;
     }
 
@@ -110,17 +110,17 @@ class Worker
         return $faculty;
     }
 
-    public function save($workerId, $title, $firstName, $lastName, $fullName, $login, $factoryId)
+    public function save($title, $firstName, $lastName, $fullName, $login, $facultyId)
     {
         $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT INTO Worker (worker_id, title, first_name, last_name, full_name, login, factory_id) VALUES (:worker_id, :title, :first_name, :last_name, :full_name, :login, :factory_id)');
+        $stmt = $pdo->prepare('INSERT INTO Worker (title, first_name, last_name, full_name, login, faculty_id) VALUES (:worker_id, :title, :first_name, :last_name, :full_name, :login, :faculty_id)');
         $stmt->execute([
             'title' => $title,
             'first_name' => $firstName,
             'last_name' => $lastName,
             'full_name' => $fullName,
             'login' => $login,
-            'factory_id' => $factoryId
+            'faculty_id' => $facultyId
         ]);
 
     }

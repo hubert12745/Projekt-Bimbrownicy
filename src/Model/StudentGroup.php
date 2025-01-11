@@ -54,7 +54,7 @@ class StudentGroup
     public function save($studentId, $groupId)
     {
         $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT INTO student_group (student_id, group_id) VALUES (:student_id, :group_id)');
+        $stmt = $pdo->prepare('INSERT INTO StudentGroup (student_id, group_id) VALUES (:student_id, :group_id)');
         $stmt->execute([
             'student_id' => $studentId,
             'group_id' => $groupId

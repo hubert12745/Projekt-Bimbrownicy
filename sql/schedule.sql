@@ -1,18 +1,27 @@
+DROP TABLE Faculty;
+DROP TABLE Worker;
+DROP TABLE Subject;
+DROP TABLE Room;
+DROP TABLE ClassGroup;
+DROP TABLE Lesson;
+DROP TABLE Student;
+DROP TABLE StudentGroup;
+
 CREATE TABLE Faculty
 (
     faculty_id    INTEGER PRIMARY KEY AUTOINCREMENT,
-    faculty_name  TEXT NOT NULL ,
-    faculty_short TEXT NOT NULL
+    faculty_name  TEXT NOT NULL UNIQUE ,
+    faculty_short TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE Worker
 (
     worker_id  INTEGER PRIMARY KEY AUTOINCREMENT,
     title      TEXT NOT NULL,
-    first_name TEXT NOT NULL,
+    first_name TEXT NOT NULL ,
     last_name  TEXT NOT NULL,
     full_name  TEXT NOT NULL,
-    login      TEXT NOT NULL,
+    login      TEXT NOT NULL UNIQUE,
     faculty_id INTEGER NOT NULL,
     FOREIGN KEY (faculty_id) REFERENCES Faculty (faculty_id)
 );
@@ -30,7 +39,7 @@ CREATE TABLE Subject
 CREATE TABLE Room
 (
     room_id    INTEGER PRIMARY KEY AUTOINCREMENT,
-    room_name  TEXT NOT NULL,
+    room_name  TEXT NOT NULL UNIQUE,
     faculty_id INTEGER NOT NULL,
     FOREIGN KEY (faculty_id) REFERENCES Faculty (faculty_id)
 );
@@ -38,7 +47,7 @@ CREATE TABLE Room
 CREATE TABLE ClassGroup
 (
     group_id       INTEGER PRIMARY KEY AUTOINCREMENT,
-    group_name     TEXT NOT NULL,
+    group_name     TEXT NOT NULL UNIQUE,
     semester       INTEGER NOT NULL,
     faculty_id     INTEGER NOT NULL,
     department     TEXT NOT NULL,

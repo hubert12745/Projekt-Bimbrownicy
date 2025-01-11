@@ -1,10 +1,12 @@
 <?php
-
 namespace App\Model;
+require_once __DIR__ . '/../Service/Config.php';
+use PDO;
+use App\Service\Config;
 
 class Faculty
 {
-    private ?int $facultyId;
+    private ?int $facultyId = null;
     private ?string $facultyName;
     private ?string $facultyShort;
 
@@ -40,17 +42,11 @@ class Faculty
         $this->facultyShort = $facultyShort;
         return $this;
     }
-
-
     public function fill($array): Faculty
     {
-        foreach ($array as $key => $value) {
-            $method = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-            if (method_exists($this, $method)) {
-                $this->$method($value);
-            }
-        }
-
+        $this->setFacultyName($array['wydzial']);
+        $this->setFacultyShort($array['wydz_sk']);
+        echo "Filled";
         return $this;
     }
 
@@ -58,17 +54,18 @@ class Faculty
     {
         $faculty = new self();
         $faculty->fill($array);
-
+        echo "dupa";
         return $faculty;
     }
 
-    public function save($facultyId, $facultyName, $facultyShort)
+    public function save($facultyName, $facultyShort)
     {
-        $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT INTO Faculty ( faculty_name, faculty_short) VALUES (:faculty_name, :faculty_short)');
+        $pdo = new \PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
+        $stmt = $pdo->prepare('INSERT OR IGNORE INTO Faculty ( faculty_name, faculty_short) VALUES (:faculty_name, :faculty_short)');
         $stmt->execute([
             'faculty_name' => $facultyName,
             'faculty_short' => $facultyShort
         ]);
+        echo "Saved";
     }
 }

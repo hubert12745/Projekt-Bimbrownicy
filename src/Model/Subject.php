@@ -75,10 +75,10 @@ class Subject
         return $faculty;
     }
 
-    public function save($subjectId, $subjectName, $subjectType, $facultyId)
+    public function save($subjectName, $subjectType, $facultyId)
     {
         $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT INTO subjects (subject_id, subject_name, subject_type, faculty_id) VALUES (:subject_id, :subject_name, :subject_type, :faculty_id)');
+        $stmt = $pdo->prepare('INSERT INTO Subject (subject_name, subject_type, faculty_id) VALUES (:subject_id, :subject_name, :subject_type, :faculty_id)');
         $stmt->execute([
             'subject_name' => $subjectName,
             'subject_type' => $subjectType,
