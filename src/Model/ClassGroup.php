@@ -79,6 +79,24 @@ class ClassGroup
         return $this;
     }
 
+    public function fill($array): ClassGroup
+    {
+        foreach ($array as $key => $value) {
+            $method = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+            if (method_exists($this, $method)) {
+                $this->$method($value);
+            }
+        }
+
+        return $this;
+    }
+    public static function fromApi($array): ClassGroup
+    {
+        $classGroup = new self();
+        $classGroup->fill($array);
+
+        return $classGroup;
+    }
     public function save($groupId, $groupName, $semester, $facultyId, $department, $fieldOfStudy)
     {
         $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
