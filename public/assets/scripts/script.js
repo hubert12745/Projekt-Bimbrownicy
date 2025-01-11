@@ -211,9 +211,11 @@ function addEvent() {
  ****************************/
 
 document.addEventListener('DOMContentLoaded', () => {
+    //Filtry
     const showFiltersBtn = document.getElementById('showFiltersBtn');
     const closeFiltersBtn = document.getElementById('closeFiltersBtn');
     const filtersPanel = document.getElementById('filters');
+
 
     // Po kliknięciu "Pokaż filtry" -> dodajemy .active (panel zasłoni sidebar)
     showFiltersBtn.addEventListener('click', () => {
@@ -225,6 +227,21 @@ document.addEventListener('DOMContentLoaded', () => {
         filtersPanel.classList.remove('active');
     });
 
+
+
+    //Ulubione
+    const showFavouritesBtn = document.getElementById('showFavouritesBtn');
+    const closeFavouritesBtn = document.getElementById('closeFavouritesBtn');
+    const favouritesPanel = document.getElementById('favourites');
+
+    showFavouritesBtn.addEventListener('click', () => {
+        favouritesPanel.classList.add('active');
+    });
+    closeFavouritesBtn.addEventListener('click', () => {
+        favouritesPanel.classList.remove('active');
+    });
+
+
     // Obsługa przycisków tygodniowych i dodawania eventów
     document.getElementById("prevWeekBtn").addEventListener("click", () => shiftWeek(-1));
     document.getElementById("nextWeekBtn").addEventListener("click", () => shiftWeek(1));
@@ -232,4 +249,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Na start rysujemy bieżący tydzień
     renderWeek();
+
+    //Dodawanie do ulubionych
+    const favList = document.getElementById('buttonList');
+    const addFavoriteBtn = document.getElementById('addFavourtiesBtn');
+    addFavoriteBtn.addEventListener('click', () => {
+
+        const userInput = prompt("Dodaj nazwę planu:");
+        const newButton = document.createElement('button');
+        newButton.textContent = userInput;
+
+        // Dodanie przycisku do listy
+        const listItem = document.createElement('li');
+        listItem.appendChild(newButton);
+        favList.appendChild(listItem);
+
+        // Zapisanie do localStorage
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        favorites.push(userInput);
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+
+        alert("Filtry zapisane w ulubionych!");
+
+
+
+    });
+    // Ładowanie przycisków z localStorage przy starcie
+    const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    savedFavorites.forEach(fav => {
+        const newButton = document.createElement('button');
+        newButton.textContent = fav;
+        const listItem = document.createElement('li');
+        listItem.appendChild(newButton);
+        favList.appendChild(listItem);
+    });
 });
+
