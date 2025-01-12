@@ -33,7 +33,7 @@ class ScrapeData
         }
         if (isset($object['group_name'])) {
             $group = ClassGroup::fromApi($object);
-            $group->save($group->getGroupName(), $group->getFacultyId(), $group->getSemester(), $group->getFaculty(), $group->getFieldOfStudy());
+            $group->save($group->getGroupName(), $group->getSemester(), $group->getFacultyId(), $group->getFaculty(), $group->getFieldOfStudy());
         }
 
         if (isset($object['room'])) {
