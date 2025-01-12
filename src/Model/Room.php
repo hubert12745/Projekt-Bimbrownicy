@@ -7,9 +7,9 @@ use PDO;
 
 class Room
 {
-    private ?int $room_id;
-    private ?string $room_name;
-    private ?int $faculty_id;
+    private ?int $room_id   = null;
+    private ?string $room_name  = null;
+    private ?int $faculty_id = null;
 
     public function getRoomId(): ?int
     {
@@ -44,35 +44,64 @@ class Room
         return $this;
     }
 
-    public function fill($array): Room
+
+    private function findForeignKeys(string $facultyShort): ?int
     {
-        $this->setRoomName($array['room']);
-        $this->setFacultyId($this->findForeignKeys($array['wydz_sk']));
+        $pdo = new PDO(
+            Config::get('db_dsn'),
+            Config::get('db_user'),
+            Config::get('db_pass')
+        );
+
+        $stmt = $pdo->prepare(
+            'SELECT faculty_id FROM Faculty WHERE faculty_short = :faculty_short'
+        );
+        $stmt->execute(['faculty_short' => $facultyShort]);
+
+        $facultyId = $stmt->fetchColumn();
+
+        if ($facultyId === false) {
+            return null;
+        }
+
+        return (int)$facultyId;
+    }
+
+
+    public function fill(array $array): Room
+    {
+        $this->setRoomName($array['room'] ?? null);
+
+        $facultyId = $this->findForeignKeys($array['wydz_sk'] ?? '');
+        $this->setFacultyId($facultyId);
+
         return $this;
     }
 
-    private function findForeignKeys($facultyShort):int
-    {
-        $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('SELECT faculty_id FROM Faculty WHERE faculty_short = :faculty_short');
-        $stmt->execute(['faculty_short' => $facultyShort]);
-        return$stmt->fetchColumn();
-    }
-    public static function fromApi($array): Room
+    public static function fromApi(array $array): Room
     {
         $room = new self();
         $room->fill($array);
         return $room;
     }
 
-    public function save( $room_name, $faculty_id)
+
+    public function save(?string $room_name, ?int $faculty_id): void
     {
-        $pdo = new \PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT OR IGNORE INTO Room ( room_name, faculty_id) VALUES ( :room_name, :faculty_id)');
+        $pdo = new PDO(
+            Config::get('db_dsn'),
+            Config::get('db_user'),
+            Config::get('db_pass')
+        );
+
+        $stmt = $pdo->prepare(
+            'INSERT OR IGNORE INTO Room (room_name, faculty_id)
+             VALUES (:room_name, :faculty_id)'
+        );
+
         $stmt->execute([
-            'room_name' => $room_name,
+            'room_name'  => $room_name,
             'faculty_id' => $faculty_id
         ]);
     }
-
 }

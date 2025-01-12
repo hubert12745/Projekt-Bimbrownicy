@@ -4,12 +4,13 @@ namespace App\Model;
 
 use App\Service\Config;
 use PDO;
+
 class Subject
 {
-    private ?int $subjectId;
-    private ?string $subjectName;
-    private ?string $subjectType;
-    private ?int $facultyId;
+    private ?int $subjectId   = null;
+    private ?string $subjectName = null;
+    private ?string $subjectType = null;
+    private ?int $facultyId   = null;
 
     public function getSubjectId(): ?int
     {
@@ -55,40 +56,62 @@ class Subject
         return $this;
     }
 
-    private function findForeignKeys($facultyShort): int
+    private function findForeignKeys(string $facultyShort): ?int
     {
-        $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('SELECT faculty_id FROM Faculty WHERE faculty_short = :faculty_short');
-        return $stmt->execute(['faculty_short' => $facultyShort]);
-    }
-    public function fill($array): Subject
-    {
+        $pdo = new PDO(
+            Config::get('db_dsn'),
+            Config::get('db_user'),
+            Config::get('db_pass')
+        );
+        $stmt = $pdo->prepare(
+            'SELECT faculty_id FROM Faculty WHERE faculty_short = :faculty_short'
+        );
 
-        $this->setSubjectName($array['title']);
-        $this->setSubjectType($array['lesson_form']);
-        $this->setFacultyId($this->findForeignKeys($array['wydz_sk']));
+        $stmt->execute(['faculty_short' => $facultyShort]);
+        $facultyId = $stmt->fetchColumn();
+
+        if ($facultyId === false) {
+            return null;
+        }
+
+        return (int) $facultyId;
+    }
+
+    public function fill(array $array): Subject
+    {
+        $this->setSubjectName($array['title'] ?? null);
+        $this->setSubjectType($array['lesson_form'] ?? null);
+
+        $facultyId = $this->findForeignKeys($array['wydz_sk'] ?? '');
+        $this->setFacultyId($facultyId);
 
         return $this;
     }
 
-    public static function fromApi($array): Subject
+    public static function fromApi(array $array): Subject
     {
-        $faculty = new self();
-        $faculty->fill($array);
-
-        return $faculty;
+        $subject = new self();
+        $subject->fill($array);
+        return $subject;
     }
 
-    public function save($subjectName, $subjectType, $facultyId)
+    public function save(?string $subjectName, ?string $subjectType, ?int $facultyId): void
     {
-        $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT OR IGNORE INTO Subject (subject_name, subject_type, faculty_id) VALUES ( :subject_name, :subject_type, :faculty_id)');
+        $pdo = new PDO(
+            Config::get('db_dsn'),
+            Config::get('db_user'),
+            Config::get('db_pass')
+        );
+
+        $stmt = $pdo->prepare(
+            'INSERT OR IGNORE INTO Subject (subject_name, subject_type, faculty_id)
+             VALUES (:subject_name, :subject_type, :faculty_id)'
+        );
+
         $stmt->execute([
             'subject_name' => $subjectName,
             'subject_type' => $subjectType,
-            'faculty_id' => $facultyId
+            'faculty_id'   => $facultyId
         ]);
     }
-
-
 }
