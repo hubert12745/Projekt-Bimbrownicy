@@ -11,7 +11,7 @@ class ClassGroup
     private ?string $groupName;
     private ?int $semester;
     private ?int $facultyId;
-    private ?string $department;
+    private ?string $faculty;
     private ?string $fieldOfStudy;
 
     public function getGroupId(): ?int
@@ -58,14 +58,14 @@ class ClassGroup
         return $this;
     }
 
-    public function getDepartment(): ?string
+    public function getFaculty(): ?string
     {
-        return $this->department;
+        return $this->faculty;
     }
 
-    public function setDepartment(?string $department): ClassGroup
+    public function setFaculty(?string $faculty): ClassGroup
     {
-        $this->department = $department;
+        $this->faculty = $faculty;
         return $this;
     }
 
@@ -79,14 +79,20 @@ class ClassGroup
         $this->fieldOfStudy = $fieldOfStudy;
         return $this;
     }
+    private function findForeignKeys($facultyShort): int
+    {
+        $pdo = new \PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
+        $stmt = $pdo->prepare('SELECT faculty_id FROM Faculty WHERE faculty_short = :faculty_short');
+        return  $stmt->execute(['faculty_short' => $facultyShort]);
+    }
 
     public function fill($array): ClassGroup
     {
         $this->setGroupName($array['group_name']);
         $this->setSemester($array['semestr']);
-        $this->setFacultyId($array['faculty_id']);
-        $this->setDepartment($array['department']);
-        $this->setFieldOfStudy($array['field_of_study']);
+        $this->setFacultyId($this->findForeignKeys($array['wydz_sk']));
+        $this->setFaculty($array['wydzial']);
+        $this->setFieldOfStudy($array['kierunek']);
 
         return $this;
     }
@@ -97,15 +103,15 @@ class ClassGroup
 
         return $classGroup;
     }
-    public function save($groupName, $semester, $facultyId, $department, $fieldOfStudy)
+    public function save($groupName, $semester, $facultyId, $faculty, $fieldOfStudy)
     {
-        $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT INTO ClassGroup (group_name, semester, faculty_id, department, field_of_study) VALUES (:group_name, :semester, :faculty_id, :department, :field_of_study)');
+        $pdo = new \PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
+        $stmt = $pdo->prepare('INSERT OR IGNORE INTO ClassGroup (group_name, semester, faculty_id, department, field_of_study) VALUES (:group_name, :semester, :faculty_id, :department, :field_of_study)');
         $stmt->execute([
             'group_name' => $groupName,
             'semester' => $semester,
             'faculty_id' => $facultyId,
-            'department' => $department,
+            'department' => $faculty,
             'field_of_study' => $fieldOfStudy
         ]);
     }

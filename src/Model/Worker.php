@@ -3,7 +3,7 @@
 namespace App\Model;
 
 use App\Service\Config;
-
+use PDO;
 class Worker
 {
     private ?int $workerId;
@@ -90,19 +90,25 @@ class Worker
         return $this;
     }
 
-    public function fill($array): Faculty
+    private function findForeignKeys($facultyShort): int
     {
-        foreach ($array as $key => $value) {
-            $method = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-            if (method_exists($this, $method)) {
-                $this->$method($value);
-            }
-        }
+        $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
+        $stmt = $pdo->prepare('SELECT faculty_id FROM Faculty WHERE faculty_short = :faculty_short');
+        return $stmt->execute(['faculty_short' => $facultyShort]);
+    }
+    public function fill($array): Worker
+    {
+        $this ->setTitle($array['tytul']);
+        $this ->setFirstName($array['imie']);
+        $this ->setLastName($array['nazwisko']);
+        $this ->setFullName($array['worker']);
+        $this ->setLogin($array['login']);
+        $this ->setFacultyId($this->findForeignKeys($array['wydz_sk']));
 
         return $this;
     }
 
-    public static function fromApi($array): Faculty
+    public static function fromApi($array): Worker
     {
         $faculty = new self();
         $faculty->fill($array);
@@ -113,7 +119,7 @@ class Worker
     public function save($title, $firstName, $lastName, $fullName, $login, $facultyId)
     {
         $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT INTO Worker (title, first_name, last_name, full_name, login, faculty_id) VALUES (:worker_id, :title, :first_name, :last_name, :full_name, :login, :faculty_id)');
+        $stmt = $pdo->prepare('INSERT OR IGNORE INTO Worker (title, first_name, last_name, full_name, login, faculty_id) VALUES ( :title, :first_name, :last_name, :full_name, :login, :faculty_id)');
         $stmt->execute([
             'title' => $title,
             'first_name' => $firstName,

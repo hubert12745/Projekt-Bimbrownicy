@@ -20,10 +20,13 @@ function scrape(string $faculty, string $start, string $end): void
 }
 
 try {
-    $faculty = 'WI';
+    $faculties =  ['WI', 'WE'];
     $start = '2025-01-07';
     $end = '2025-01-08';
-    scrape($faculty, $start, $end);
+    foreach ($faculties as $faculty) {
+        scrape($faculty, $start, $end);
+    }
+
     echo 'Scraping successful' . PHP_EOL;
 } catch (Exception $e) {
     echo 'Scraping failed: ' . $e->getMessage() . PHP_EOL;

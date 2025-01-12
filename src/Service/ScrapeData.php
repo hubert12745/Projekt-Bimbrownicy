@@ -27,34 +27,34 @@ class ScrapeData
     private function addData(array $object)
     {
         if (isset($object['wydzial'])) {
-        $facultyName = Faculty::fromApi($object);
-        $facultyName->save($facultyName->getFacultyName(), $facultyName->getFacultyShort());
-        echo "Faculty added" . PHP_EOL;
+            $faculty = Faculty::fromApi($object);
+            $faculty->save($faculty->getFacultyName(), $faculty->getFacultyShort());
+            echo "Faculty added" . PHP_EOL;
         }
-//        if (isset($object['group_name'])) {
-//            $groupName = ClassGroup::fromApi($object);
-//            $groupName->save($groupName->getGroupId(), $groupName->getFacultyId(), $groupName->getSemester(), $groupName->getDepartment(), $groupName->getFieldOfStudy());
-//        }
-//
-//        if (isset($object['room_name'])) {
-//            $roomName = Room::fromApi($object);
-//            $roomName->save($roomName->getRoomId(), $roomName->getFacultyId());
-//        }
-//
-//        if (isset($object['worker_name'])) {
-//            $workerName = Worker::fromApi($object);
-//            $workerName->save($workerName->getWorkerId());
-//        }
-//
-//        if (isset($object['subject_name'])) {
-//            $subjectName = Subject::fromApi($object);
-//            $subjectName->save($subjectName->getSubjectId());
-//        }
-//
-//        if (isset($object['lesson_id'])) {
-//            $lessonId = Lesson::fromApi($object);
-//            $lessonId->save($lessonId->getLessonId(), $lessonId->getSubjectId(), $lessonId->getWorkerId(), $lessonId->getGroupId(), $lessonId->getRoomId());
-//        }
+        if (isset($object['group_name'])) {
+            $group = ClassGroup::fromApi($object);
+            $group->save($group->getGroupName(), $group->getFacultyId(), $group->getSemester(), $group->getFaculty(), $group->getFieldOfStudy());
+        }
+
+        if (isset($object['room'])) {
+            $room = Room::fromApi($object);
+            $room->save($room->getRoomName(), $room->getFacultyId());
+        }
+
+        if (isset($object['worker'])) {
+            $worker = Worker::fromApi($object);
+            $worker->save($worker->getTitle(), $worker->getFirstName(), $worker->getLastName(), $worker->getFullName(), $worker->getLogin(), $worker->getFacultyId());
+        }
+
+        if (isset($object['title'])) {
+            $subject = Subject::fromApi($object);
+            $subject->save($subject->getSubjectName(), $subject->getSubjectType(), $subject->getFacultyId());
+        }
+
+        if (isset($object['description'])) {
+            $lesson = Lesson::fromApi($object);
+            $lesson->save($lesson->getSubjectId(), $lesson->getWorkerId(), $lesson->getGroupId(), $lesson->getRoomId(),$lesson->getLessonDescription(), $lesson->getLessonForm(), $lesson->getLessonFormShort(), $lesson->getLessonStatus(), $lesson->getLessonStart(), $lesson->getLessonEnd());
+        }
 //        if (isset($object['student_id'])) {
 //            $studentId = Student::fromApi($object);
 //            $studentId->save($studentId->getStudentId());

@@ -29,7 +29,7 @@ CREATE TABLE Worker
 CREATE TABLE Subject
 (
     subject_id   INTEGER PRIMARY KEY AUTOINCREMENT,
-    subject_name TEXT NOT NULL,
+    subject_name TEXT NOT NULL UNIQUE,
     subject_type TEXT NOT NULL,
     faculty_id   INTEGER NOT NULL,
     FOREIGN KEY (faculty_id) REFERENCES Faculty (faculty_id)
@@ -62,10 +62,10 @@ CREATE TABLE Lesson
     worker_id           INTEGER NOT NULL,
     group_id            INTEGER NOT NULL,
     room_id             INTEGER NOT NULL,
+    lesson_description  TEXT NOT NULL,
     lesson_form         TEXT NOT NULL,
     lesson_form_short   TEXT NOT NULL,
     lesson_status       TEXT NOT NULL,
-    lesson_status_short TEXT NOT NULL,
     lesson_start        TEXT NOT NULL,
     lesson_end          TEXT NOT NULL,
     FOREIGN KEY (subject_id) REFERENCES Subject (subject_id),

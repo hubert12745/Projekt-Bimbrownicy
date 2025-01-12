@@ -3,7 +3,7 @@
 namespace App\Model;
 
 use App\Service\Config;
-
+use PDO;
 class Subject
 {
     private ?int $subjectId;
@@ -55,19 +55,23 @@ class Subject
         return $this;
     }
 
-    public function fill($array): Faculty
+    private function findForeignKeys($facultyShort): int
     {
-        foreach ($array as $key => $value) {
-            $method = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-            if (method_exists($this, $method)) {
-                $this->$method($value);
-            }
-        }
+        $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
+        $stmt = $pdo->prepare('SELECT faculty_id FROM Faculty WHERE faculty_short = :faculty_short');
+        return $stmt->execute(['faculty_short' => $facultyShort]);
+    }
+    public function fill($array): Subject
+    {
+
+        $this->setSubjectName($array['title']);
+        $this->setSubjectType($array['lesson_form']);
+        $this->setFacultyId($this->findForeignKeys($array['wydz_sk']));
 
         return $this;
     }
 
-    public static function fromApi($array): Faculty
+    public static function fromApi($array): Subject
     {
         $faculty = new self();
         $faculty->fill($array);
@@ -78,7 +82,7 @@ class Subject
     public function save($subjectName, $subjectType, $facultyId)
     {
         $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT INTO Subject (subject_name, subject_type, faculty_id) VALUES (:subject_id, :subject_name, :subject_type, :faculty_id)');
+        $stmt = $pdo->prepare('INSERT OR IGNORE INTO Subject (subject_name, subject_type, faculty_id) VALUES ( :subject_name, :subject_type, :faculty_id)');
         $stmt->execute([
             'subject_name' => $subjectName,
             'subject_type' => $subjectType,

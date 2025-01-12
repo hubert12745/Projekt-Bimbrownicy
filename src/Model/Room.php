@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use App\Service\Config;
+use PDO;
 
 class Room
 {
@@ -45,16 +46,18 @@ class Room
 
     public function fill($array): Room
     {
-        foreach ($array as $key => $value) {
-            $method = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-            if (method_exists($this, $method)) {
-                $this->$method($value);
-            }
-        }
-
+        $this->setRoomName($array['room']);
+        $this->setFacultyId($this->findForeignKeys($array['wydz_sk']));
         return $this;
     }
 
+    private function findForeignKeys($facultyShort):int
+    {
+        $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
+        $stmt = $pdo->prepare('SELECT faculty_id FROM Faculty WHERE faculty_short = :faculty_short');
+        $stmt->execute(['faculty_short' => $facultyShort]);
+        return$stmt->fetchColumn();
+    }
     public static function fromApi($array): Room
     {
         $room = new self();
@@ -65,7 +68,7 @@ class Room
     public function save( $room_name, $faculty_id)
     {
         $pdo = new \PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT INTO room ( room_name, faculty_id) VALUES (:room_id, :room_name, :faculty_id)');
+        $stmt = $pdo->prepare('INSERT OR IGNORE INTO Room ( room_name, faculty_id) VALUES ( :room_name, :faculty_id)');
         $stmt->execute([
             'room_name' => $room_name,
             'faculty_id' => $faculty_id
