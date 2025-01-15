@@ -476,3 +476,62 @@ function refreshFavouritesList() {
         favList.appendChild(listItem);
     });
 }
+function shareSchedule() {
+    const filters = {
+        wydzial: document.getElementById('wydzial').value,
+        wykladowca: document.getElementById('wykladowca').value,
+        sala: document.getElementById('sala').value,
+        przedmiot: document.getElementById('przedmiot').value,
+        grupa: document.getElementById('grupa').value,
+        forma: document.getElementById('forma').value,
+        typStudiow: document.getElementById('typStudiow').value,
+        semestrStudiow: document.getElementById('semestrStudiow').value,
+        rokStudiow: document.getElementById('rokStudiow').value
+    };
+
+    const queryString = new URLSearchParams(filters).toString();
+    const shareUrl = `${window.location.origin}${window.location.pathname}?${queryString}`;
+    prompt("Skopiuj ten URL, aby podzielić się planem lekcji:", shareUrl);
+}
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    document.getElementById('wydzial').value = urlParams.get('wydzial') || '';
+    document.getElementById('wykladowca').value = urlParams.get('wykladowca') || '';
+    document.getElementById('sala').value = urlParams.get('sala') || '';
+    document.getElementById('przedmiot').value = urlParams.get('przedmiot') || '';
+    document.getElementById('grupa').value = urlParams.get('grupa') || '';
+    document.getElementById('forma').value = urlParams.get('forma') || '';
+    document.getElementById('typStudiow').value = urlParams.get('typStudiow') || '';
+    document.getElementById('semestrStudiow').value = urlParams.get('semestrStudiow') || '';
+    document.getElementById('rokStudiow').value = urlParams.get('rokStudiow') || '';
+
+    // Opcjonalnie: automatycznie zastosuj filtry po załadowaniu
+    applyFilters();
+});
+function applyFilters() {
+    const filters = {
+        wydzial: document.getElementById('wydzial').value,
+        wykladowca: document.getElementById('wykladowca').value,
+        sala: document.getElementById('sala').value,
+        przedmiot: document.getElementById('przedmiot').value,
+        grupa: document.getElementById('grupa').value,
+        forma: document.getElementById('forma').value,
+        typStudiow: document.getElementById('typStudiow').value,
+        semestrStudiow: document.getElementById('semestrStudiow').value,
+        rokStudiow: document.getElementById('rokStudiow').value
+    };
+
+    const queryString = new URLSearchParams(filters).toString();
+
+    fetch(`/assets/scripts/FiltersLogic.php?${queryString}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Returned data:', data); // Log the returned data
+            renderWeek(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+//DZIELENIE PLANEM

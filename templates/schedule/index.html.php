@@ -88,6 +88,7 @@ ob_start(); ?>
 
                 </ul>
             </div>
+            <button onclick="shareSchedule()">Udostępnij plan</button>
 
         </div>
 
