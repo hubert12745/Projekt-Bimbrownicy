@@ -130,7 +130,7 @@ function highlightToday() {
  RENDEROWANIE TYGODNIA
  ****************************/
 
-function renderWeek() {
+function renderWeek(filteredEvents = events) {
     // 1) Budujemy pustą tabelę (wiersze + kolumny)
     buildScheduleBody();
 
@@ -143,7 +143,7 @@ function renderWeek() {
     }
 
     // 3) Wypełniamy tabelę wydarzeniami
-    events.forEach(ev => {
+    filteredEvents.forEach(ev => {
         const evDate = new Date(ev.date);
         const diffDays = (evDate - currentMonday) / (1000*60*60*24);
         if (diffDays >= 0 && diffDays < 7) {
@@ -265,6 +265,32 @@ function addEvent() {
  OBSŁUGA PANELU FILTRÓW
  ****************************/
 
+function applyFilters() {
+    const filters = {
+        wydzial: document.getElementById('wydzial').value,
+        wykladowca: document.getElementById('wykladowca').value,
+        sala: document.getElementById('sala').value,
+        przedmiot: document.getElementById('przedmiot').value,
+        grupa: document.getElementById('grupa').value,
+        forma: document.getElementById('forma').value,
+        typStudiow: document.getElementById('typStudiow').value,
+        semestrStudiow: document.getElementById('semestrStudiow').value,
+        rokStudiow: document.getElementById('rokStudiow').value
+    };
+
+    const queryString = new URLSearchParams(filters).toString();
+
+    fetch(`/assets/scripts/FiltersLogic.php?${queryString}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Returned data:', data); // Log the returned data
+            renderWeek(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Filtry
     const showFiltersBtn = document.getElementById('showFiltersBtn');
@@ -367,4 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Obsługa przycisku "Zastosuj filtry"
+    document.querySelector('.filter-buttons button[type="button"]').addEventListener('click', applyFilters);
 });
