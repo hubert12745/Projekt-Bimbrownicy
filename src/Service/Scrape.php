@@ -20,14 +20,16 @@ function scrape(string $faculty, string $start, string $end): void
 }
 
 try {
-    $faculties =  ['WI', 'WE'];
+    $startTime = microtime(true);
+//    $faculties =  ['WA','WBiHZ','WBiIS','WE','WEkon','WI','WIMiM','WKSiR','WNoZiR','WTMiT','WTiICH'];
+    $faculties =  ['WI'];
     $start = '2025-01-07';
-    $end = '2025-01-08';
+    $end = '2025-01-15';
     foreach ($faculties as $faculty) {
         scrape($faculty, $start, $end);
     }
-
-    echo 'Scraping successful' . PHP_EOL;
+    $timeElapsed = microtime(true) - $startTime;
+    echo "Scraping successful, time elapsed: {$timeElapsed}" . PHP_EOL;
 } catch (Exception $e) {
     echo 'Scraping failed: ' . $e->getMessage() . PHP_EOL;
 }

@@ -46,7 +46,6 @@ class Faculty
     {
         $this->setFacultyName($array['wydzial']);
         $this->setFacultyShort($array['wydz_sk']);
-        echo "Filled";
         return $this;
     }
 
@@ -54,7 +53,6 @@ class Faculty
     {
         $faculty = new self();
         $faculty->fill($array);
-        echo "dupa";
         return $faculty;
     }
 
@@ -66,6 +64,5 @@ class Faculty
             'faculty_name' => $facultyName,
             'faculty_short' => $facultyShort
         ]);
-        echo "Saved";
     }
 }

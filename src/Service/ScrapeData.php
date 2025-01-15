@@ -18,7 +18,6 @@ class ScrapeData
         $url = "https://plan.zut.edu.pl/schedule_student.php?kind=apiwi&department={$faculty}&start={$start}&end={$end}";
         $data = file_get_contents($url);
         $data = json_decode($data, true);
-        echo "Data fetched" . PHP_EOL;
         foreach ($data as $object) {
             $this->addData($object);
         }
@@ -29,11 +28,10 @@ class ScrapeData
         if (isset($object['wydzial'])) {
             $faculty = Faculty::fromApi($object);
             $faculty->save($faculty->getFacultyName(), $faculty->getFacultyShort());
-            echo "Faculty added" . PHP_EOL;
         }
         if (isset($object['group_name'])) {
             $group = ClassGroup::fromApi($object);
-            $group->save($group->getGroupName(), $group->getSemester(), $group->getFacultyId(), $group->getFaculty(), $group->getFieldOfStudy());
+            $group->save($group->getGroupName(),$group->getYear(), $group->getSemester(), $group->getFacultyId(), $group->getFaculty(), $group->getFieldOfStudy(), $group->getTypeOfStudy());
         }
 
         if (isset($object['room'])) {

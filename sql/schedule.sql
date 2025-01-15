@@ -10,28 +10,28 @@ DROP TABLE StudentGroup;
 CREATE TABLE Faculty
 (
     faculty_id    INTEGER PRIMARY KEY AUTOINCREMENT,
-    faculty_name  TEXT NOT NULL UNIQUE ,
-    faculty_short TEXT NOT NULL UNIQUE
+    faculty_name  TEXT  UNIQUE ,
+    faculty_short TEXT  UNIQUE
 );
 
 CREATE TABLE Worker
 (
     worker_id  INTEGER PRIMARY KEY AUTOINCREMENT,
-    title      TEXT NOT NULL,
-    first_name TEXT NOT NULL ,
-    last_name  TEXT NOT NULL,
-    full_name  TEXT NOT NULL,
-    login      TEXT NOT NULL UNIQUE,
-    faculty_id INTEGER NOT NULL,
+    title      TEXT ,
+    first_name TEXT  ,
+    last_name  TEXT ,
+    full_name  TEXT ,
+    login      TEXT  UNIQUE,
+    faculty_id INTEGER ,
     FOREIGN KEY (faculty_id) REFERENCES Faculty (faculty_id)
 );
 
 CREATE TABLE Subject
 (
     subject_id   INTEGER PRIMARY KEY AUTOINCREMENT,
-    subject_name TEXT NOT NULL UNIQUE,
-    subject_type TEXT NOT NULL,
-    faculty_id   INTEGER NOT NULL,
+    subject_name TEXT  UNIQUE,
+    subject_type TEXT ,
+    faculty_id   INTEGER ,
     FOREIGN KEY (faculty_id) REFERENCES Faculty (faculty_id)
 
 );
@@ -39,35 +39,37 @@ CREATE TABLE Subject
 CREATE TABLE Room
 (
     room_id    INTEGER PRIMARY KEY AUTOINCREMENT,
-    room_name  TEXT NOT NULL UNIQUE,
-    faculty_id INTEGER NOT NULL,
+    room_name  TEXT  UNIQUE,
+    faculty_id INTEGER ,
     FOREIGN KEY (faculty_id) REFERENCES Faculty (faculty_id)
 );
 
 CREATE TABLE ClassGroup
 (
     group_id       INTEGER PRIMARY KEY AUTOINCREMENT,
-    group_name     TEXT NOT NULL UNIQUE,
-    semester       INTEGER NOT NULL,
-    faculty_id     INTEGER NOT NULL,
-    department     TEXT NOT NULL,
-    field_of_study TEXT NOT NULL,
+    group_name     TEXT  UNIQUE,
+    semester       INTEGER ,
+    year           INTEGER ,
+    faculty_id     INTEGER ,
+    department     TEXT ,
+    field_of_study TEXT ,
+    type_of_study  TEXT ,
     FOREIGN KEY (faculty_id) REFERENCES Faculty (faculty_id)
 );
 
 CREATE TABLE Lesson
 (
     lesson_id           INTEGER PRIMARY KEY AUTOINCREMENT,
-    subject_id          INTEGER NOT NULL,
-    worker_id           INTEGER NOT NULL,
-    group_id            INTEGER NOT NULL,
-    room_id             INTEGER NOT NULL,
-    lesson_description  TEXT NOT NULL,
-    lesson_form         TEXT NOT NULL,
-    lesson_form_short   TEXT NOT NULL,
-    lesson_status       TEXT NOT NULL,
-    lesson_start        TEXT NOT NULL,
-    lesson_end          TEXT NOT NULL,
+    subject_id          INTEGER ,
+    worker_id           INTEGER ,
+    group_id            INTEGER ,
+    room_id             INTEGER ,
+    lesson_description  TEXT ,
+    lesson_form         TEXT ,
+    lesson_form_short   TEXT ,
+    lesson_status       TEXT ,
+    lesson_start        TEXT ,
+    lesson_end          TEXT ,
     FOREIGN KEY (subject_id) REFERENCES Subject (subject_id),
     FOREIGN KEY (worker_id) REFERENCES Worker (worker_id),
     FOREIGN KEY (group_id) REFERENCES ClassGroup (group_id),
@@ -81,8 +83,8 @@ CREATE TABLE Student
 
 CREATE TABLE StudentGroup
 (
-    student_id INTEGER NOT NULL,
-    group_id   INTEGER NOT NULL,
+    student_id INTEGER ,
+    group_id   INTEGER ,
     FOREIGN KEY (student_id) REFERENCES Student (student_id),
     FOREIGN KEY (group_id) REFERENCES ClassGroup (group_id)
 );

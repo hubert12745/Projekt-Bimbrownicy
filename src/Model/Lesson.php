@@ -155,9 +155,12 @@ class Lesson
     private function findId(
         string $tableName,
         string $whereColumn,
-        string $value,
+        ?string $value,
         string $idColumn
     ): ?int {
+        if ($value === null) {
+            return null;
+        }
         $pdo = new \PDO(
             Config::get('db_dsn'),
             Config::get('db_user'),
