@@ -327,32 +327,11 @@ document.addEventListener('DOMContentLoaded', () => {
     highlightToday();
 
     // Dodawanie do ulubionych
-    const favList = document.getElementById('buttonList');
-    const addFavoriteBtn = document.getElementById('addFavourtiesBtn');
-    addFavoriteBtn.addEventListener('click', () => {
-        const userInput = prompt("Dodaj nazwę planu:");
-        const newButton = document.createElement('button');
-        newButton.textContent = userInput;
+    // Nasłuch na przycisk "Dodaj do ulubionych"
+    document.getElementById('addFavourtiesBtn').addEventListener('click', addFavourite);
 
-        const listItem = document.createElement('li');
-        listItem.appendChild(newButton);
-        favList.appendChild(listItem);
-
-        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        favorites.push(userInput);
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-
-        alert("Filtry zapisane w ulubionych!");
-    });
-
-    const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    savedFavorites.forEach(fav => {
-        const newButton = document.createElement('button');
-        newButton.textContent = fav;
-        const listItem = document.createElement('li');
-        listItem.appendChild(newButton);
-        favList.appendChild(listItem);
-    });
+    // Wczytaj listę z localStorage i od razu wyświetl
+    refreshFavouritesList();
 
     // Podpowiedzi do wyszukiwania
     const filters = ['wydzial', 'wykladowca', 'sala', 'przedmiot', 'grupa', 'forma', 'typStudiow', 'semestrStudiow', 'rokStudiow'];
@@ -396,4 +375,104 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Obsługa przycisku "Zastosuj filtry"
     document.querySelector('.filter-buttons button[type="button"]').addEventListener('click', applyFilters);
+
+    //POBIERANIE FILTRÓW
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById("prevWeekBtn").addEventListener("click", () => shiftWeek(-1))
+        {
+            const filterWydział = document.getElementById('wydzial').value;
+            const filterWykladowca = document.getElementById('wykladowca').value;
+            const filterSala = document.getElementById('sala').value;
+            const filterPrzedmiot = document.getElementById('przedmiot').value;
+            const filterGrupa = document.getElementById('grupa').value;
+            const filterForma = document.getElementById('forma').value;
+            const filterTypStudiow = document.getElementById('typStudiow').value;
+            const filterSemestrStudiow = document.getElementById('semestrStudiow').value;
+            const filterRokStudiow = document.getElementById('rokStudiow').value;
+        }
+    });
 });
+function addFavourite() {
+    // Najpierw pobieramy wartości z pól formularza
+    const filterWydzial = document.getElementById('wydzial').value;
+    const filterWykladowca = document.getElementById('wykladowca').value;
+    const filterSala = document.getElementById('sala').value;
+    const filterPrzedmiot = document.getElementById('przedmiot').value;
+    const filterGrupa = document.getElementById('grupa').value;
+    const filterForma = document.getElementById('forma').value;
+    const filterTypStudiow = document.getElementById('typStudiow').value;
+    const filterSemestrStudiow = document.getElementById('semestrStudiow').value;
+    const filterRokStudiow = document.getElementById('rokStudiow').value;
+
+    // Pytamy użytkownika o nazwę planu
+    const userInput = prompt("Dodaj nazwę planu:");
+
+    // Jeśli użytkownik anuluje prompt lub nie poda nazwy, wyjdź z funkcji
+    if (!userInput) return;
+
+    // Tworzymy obiekt, który będzie przechowywał nazwę planu i wszystkie filtry
+    const newFavorite = {
+        name: userInput,
+        wydzial: filterWydzial,
+        wykladowca: filterWykladowca,
+        sala: filterSala,
+        przedmiot: filterPrzedmiot,
+        grupa: filterGrupa,
+        forma: filterForma,
+        typStudiow: filterTypStudiow,
+        semestrStudiow: filterSemestrStudiow,
+        rokStudiow: filterRokStudiow
+    };
+
+    // Pobieramy aktualną listę ulubionych z localStorage (lub pustą tablicę jeśli brak)
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+    // Dodajemy nowy obiekt do tablicy favorites
+    favorites.push(newFavorite);
+
+    // Zapisujemy zaktualizowaną tablicę do localStorage
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+
+    // Po zapisaniu – odświeżamy listę przycisków w ulubionych
+    refreshFavouritesList();
+
+    alert("Filtry zapisane w ulubionych!");
+}
+function refreshFavouritesList() {
+    // 1. Odczytujemy z localStorage
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+    // 2. Szukamy <ul> (lub <ol>) z id="buttonList" i czyścimy jego zawartość
+    const favList = document.getElementById('buttonList');
+    favList.innerHTML = '';
+
+    // 3. Iterujemy po each "favorite"
+    favorites.forEach((fav, index) => {
+        // Tworzymy element listy
+        const listItem = document.createElement('li');
+
+        // Tworzymy przycisk
+        const newButton = document.createElement('button');
+        newButton.textContent = fav.name;  // nazwa planu
+
+        // Po kliknięciu wczytujemy zapamiętane filtry do formularza
+        newButton.addEventListener('click', () => {
+            document.getElementById('wydzial').value = fav.wydzial;
+            document.getElementById('wykladowca').value = fav.wykladowca;
+            document.getElementById('sala').value = fav.sala;
+            document.getElementById('przedmiot').value = fav.przedmiot;
+            document.getElementById('grupa').value = fav.grupa;
+            document.getElementById('forma').value = fav.forma;
+            document.getElementById('typStudiow').value = fav.typStudiow;
+            document.getElementById('semestrStudiow').value = fav.semestrStudiow;
+            document.getElementById('rokStudiow').value = fav.rokStudiow;
+
+            // Tutaj ewentualnie możemy wywołać funkcję, która przeładuje plan w tabeli
+            // np. loadPlan();
+        });
+
+        // Dodajemy przycisk do listy
+        listItem.appendChild(newButton);
+        favList.appendChild(listItem);
+    });
+}
