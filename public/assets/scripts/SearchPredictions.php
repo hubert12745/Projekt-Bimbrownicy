@@ -45,7 +45,7 @@ if ($query && $filter) {
                 $table = 'Lesson';
                 break;
             case 'typStudiow':
-                $column = 'field_of_study';
+                $column = 'type_of_study';
                 $table = 'ClassGroup';
                 break;
             case 'semestrStudiow':
@@ -53,7 +53,7 @@ if ($query && $filter) {
                 $table = 'ClassGroup';
                 break;
             case 'rokStudiow':
-                $column = 'department';
+                $column = 'year';
                 $table = 'ClassGroup';
                 break;
             default:

@@ -5,8 +5,6 @@ document.getElementById('showCurrentWeekBtn').addEventListener('click', () => {
     highlightToday();  // Podświetlenie dzisiejszego dnia
 });
 
-
-
 document.getElementById('changeWeekBtn').addEventListener('click', () => {
     const weekPicker = document.getElementById('weekPicker').value;
     if (!weekPicker) {
@@ -19,7 +17,6 @@ document.getElementById('changeWeekBtn').addEventListener('click', () => {
     currentMonday = getMondayOfCurrentWeek(selectedDate);  // Ustawienie nowego tygodnia
     renderWeek();  // Odświeżenie kalendarza
 });
-
 
 /************************
  DANE I ZMIENNE GŁÓWNE
@@ -89,12 +86,45 @@ function buildScheduleBody() {
     }
 }
 
-
-
 /****************************
  FUNKCJA PODŚWIETLAJĄCA DZISIEJSZY DZIEŃ
  ****************************/
 
+function highlightToday() {
+    // 1) Usuwamy poprzednie podświetlenia z nagłówków dni i komórek
+    for (let i = 0; i < 7; i++) {
+        const dayHeader = document.getElementById(`day-${i}`);
+        dayHeader.classList.remove('todayHighlight');
+        for (let hour = 7; hour <= 19; hour++) {
+            const cell = document.getElementById(`day${i}-hour${hour}`);
+            if (cell) {
+                cell.classList.remove('todayHighlight');
+            }
+        }
+    }
+
+    // 2) Obliczamy, czy dziś (z wyzerowanymi godzinami) mieści się w aktualnym tygodniu
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Wyzerowanie godzin, minut, sekund
+
+    const diffDays = (today - currentMonday) / (1000 * 60 * 60 * 24);
+    // diffDays >= 0 oznacza, że "dzisiejszy" dzień jest taki sam lub późniejszy niż currentMonday
+    // diffDays < 7 oznacza, że jest w ciągu kolejnych 7 dni (0..6)
+    if (diffDays >= 0 && diffDays < 7) {
+        const dayIndex = Math.floor(diffDays);
+
+        // 3) Podświetlamy nagłówek i komórki (godziny) dla dzisiejszego dnia
+        const dayHeader = document.getElementById(`day-${dayIndex}`);
+        dayHeader.classList.add('todayHighlight');
+
+        for (let hour = 7; hour <= 19; hour++) {
+            const cell = document.getElementById(`day${dayIndex}-hour${hour}`);
+            if (cell) {
+                cell.classList.add('todayHighlight');
+            }
+        }
+    }
+}
 
 /****************************
  RENDEROWANIE TYGODNIA
@@ -121,7 +151,6 @@ function renderWeek() {
             drawEventInCells(dayIndex, ev);
         }
     });
-
 }
 
 /****************************
@@ -298,51 +327,6 @@ document.addEventListener('DOMContentLoaded', () => {
         listItem.appendChild(newButton);
         favList.appendChild(listItem);
     });
-  Calendar
-});
-// Przycisk do wyświetlania aktualnego tygodnia
-document.getElementById('showCurrentWeekBtn').addEventListener('click', () => {
-    currentMonday = getMondayOfCurrentWeek(new Date());
-    renderWeek();
-    highlightToday(); // <- ponowne wywołanie
-});
-
-function highlightToday() {
-    // 1) Usuwamy poprzednie podświetlenia z nagłówków dni i komórek
-    for (let i = 0; i < 7; i++) {
-        const dayHeader = document.getElementById(`day-${i}`);
-        dayHeader.classList.remove('todayHighlight');
-        for (let hour = 7; hour <= 19; hour++) {
-            const cell = document.getElementById(`day${i}-hour${hour}`);
-            if (cell) {
-                cell.classList.remove('todayHighlight');
-            }
-        }
-    }
-
-    // 2) Obliczamy, czy dziś (z wyzerowanymi godzinami) mieści się w aktualnym tygodniu
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Wyzerowanie godzin, minut, sekund
-
-    const diffDays = (today - currentMonday) / (1000 * 60 * 60 * 24);
-    // diffDays >= 0 oznacza, że "dzisiejszy" dzień jest taki sam lub późniejszy niż currentMonday
-    // diffDays < 7 oznacza, że jest w ciągu kolejnych 7 dni (0..6)
-    if (diffDays >= 0 && diffDays < 7) {
-        const dayIndex = Math.floor(diffDays);
-
-        // 3) Podświetlamy nagłówek i komórki (godziny) dla dzisiejszego dnia
-        const dayHeader = document.getElementById(`day-${dayIndex}`);
-        dayHeader.classList.add('todayHighlight');
-
-        for (let hour = 7; hour <= 19; hour++) {
-            const cell = document.getElementById(`day${dayIndex}-hour${hour}`);
-            if (cell) {
-                cell.classList.add('todayHighlight');
-            }
-        }
-    }
-}
-
 
     // Podpowiedzi do wyszukiwania
     const filters = ['wydzial', 'wykladowca', 'sala', 'przedmiot', 'grupa', 'forma', 'typStudiow', 'semestrStudiow', 'rokStudiow'];
@@ -384,4 +368,3 @@ function highlightToday() {
         });
     });
 });
-main
