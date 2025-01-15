@@ -1,3 +1,5 @@
+
+
 /* RESET i PODSTAWY */
 * {
     margin: 0;
@@ -5,8 +7,24 @@
     box-sizing: border-box;
     font-family: Arial, sans-serif;
 }
+
 /* --- ULUBIONE --- */
 
+
+#weekPicker, #changeWeekBtn {
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+#changeWeekBtn {
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+}
+#changeWeekBtn:hover {
+    background-color: #2980b9;
+}
 .favourites {
     display: none;
 }
@@ -281,6 +299,7 @@ main {
 .lektorat {
     background-color: #e67e22;
 }
+
 .projekt {
     background-color: #16a085;
 }
@@ -289,4 +308,9 @@ main {
 }
 .egzamin {
     background-color: #2980b9;
+}
+/* Podświetlenie dzisiejszego dnia */
+.todayHighlight {
+    background-color: rgba(255, 255, 0, 0.2); /* Jasnożółte tło */
+    /* Dodaj inne style według uznania, np. pogrubienie, obramowanie itd. */
 }
