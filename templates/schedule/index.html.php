@@ -91,7 +91,10 @@ ob_start(); ?>
                     <button class="nav-button" id="nextWeekBtn">Następny &gt;</button>
                     <button class="nav-button" id="addEventBtn">Dodaj zajęcia</button>
                     <button class="nav-button" id="addFavourtiesBtn">&lt;3</button>
+                    <button class="nav-button" id="showCurrentWeekBtn">Pokaż bieżący tydzień</button>
                     <div class="view-buttons">
+                        <input type="date" id="weekPicker">
+                        <button id="changeWeekBtn">Pokaż tydzień</button>
                         <button class="view-button">Semestr</button>
                         <button class="view-button">Miesiąc</button>
                         <button class="view-button">Tydzień</button>
