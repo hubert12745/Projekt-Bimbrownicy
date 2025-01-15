@@ -237,25 +237,20 @@ function addEvent() {
  ****************************/
 
 document.addEventListener('DOMContentLoaded', () => {
-    //Filtry
+    // Filtry
     const showFiltersBtn = document.getElementById('showFiltersBtn');
     const closeFiltersBtn = document.getElementById('closeFiltersBtn');
     const filtersPanel = document.getElementById('filters');
 
-
-    // Po kliknięciu "Pokaż filtry" -> dodajemy .active (panel zasłoni sidebar)
     showFiltersBtn.addEventListener('click', () => {
         filtersPanel.classList.add('active');
     });
 
-    // Po kliknięciu "Ukryj filtry" -> usuwamy .active
     closeFiltersBtn.addEventListener('click', () => {
         filtersPanel.classList.remove('active');
     });
 
-
-
-    //Ulubione
+    // Ulubione
     const showFavouritesBtn = document.getElementById('showFavouritesBtn');
     const closeFavouritesBtn = document.getElementById('closeFavouritesBtn');
     const favouritesPanel = document.getElementById('favourites');
@@ -267,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
         favouritesPanel.classList.remove('active');
     });
 
-
     // Obsługa przycisków tygodniowych i dodawania eventów
     document.getElementById("prevWeekBtn").addEventListener("click", () => shiftWeek(-1));
     document.getElementById("nextWeekBtn").addEventListener("click", () => shiftWeek(1));
@@ -277,31 +271,25 @@ document.addEventListener('DOMContentLoaded', () => {
     renderWeek();
     highlightToday();
 
-    //Dodawanie do ulubionych
+    // Dodawanie do ulubionych
     const favList = document.getElementById('buttonList');
     const addFavoriteBtn = document.getElementById('addFavourtiesBtn');
     addFavoriteBtn.addEventListener('click', () => {
-
         const userInput = prompt("Dodaj nazwę planu:");
         const newButton = document.createElement('button');
         newButton.textContent = userInput;
 
-        // Dodanie przycisku do listy
         const listItem = document.createElement('li');
         listItem.appendChild(newButton);
         favList.appendChild(listItem);
 
-        // Zapisanie do localStorage
         let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
         favorites.push(userInput);
         localStorage.setItem('favorites', JSON.stringify(favorites));
 
         alert("Filtry zapisane w ulubionych!");
-
-
-
     });
-    // Ładowanie przycisków z localStorage przy starcie
+
     const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
     savedFavorites.forEach(fav => {
         const newButton = document.createElement('button');
@@ -310,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
         listItem.appendChild(newButton);
         favList.appendChild(listItem);
     });
+  Calendar
 });
 // Przycisk do wyświetlania aktualnego tygodnia
 document.getElementById('showCurrentWeekBtn').addEventListener('click', () => {
@@ -353,3 +342,46 @@ function highlightToday() {
         }
     }
 }
+
+
+    // Podpowiedzi do wyszukiwania
+    const filters = ['wydzial', 'wykladowca', 'sala', 'przedmiot', 'grupa', 'forma', 'typStudiow', 'semestrStudiow', 'rokStudiow'];
+    filters.forEach(filterId => {
+        const input = document.getElementById(filterId);
+        const suggestionsBox = document.createElement('div');
+        suggestionsBox.classList.add('suggestions-box');
+        input.parentNode.appendChild(suggestionsBox);
+
+        input.addEventListener('input', function () {
+            const query = this.value;
+            const filter = filterId;
+            if (query.length > 2) {
+                fetch(`/assets/scripts/SearchPredictions.php?query=${encodeURIComponent(query)}&filter=${encodeURIComponent(filter)}`)
+                    .then(response => response.text())
+                    .then(text => {
+                        console.log(text); // Log the response text for debugging
+                        return JSON.parse(text); // Parse the response text as JSON
+                    })
+                    .then(data => {
+                        suggestionsBox.innerHTML = '';
+                        data.forEach(item => {
+                            const suggestionItem = document.createElement('div');
+                            suggestionItem.classList.add('suggestion-item');
+                            suggestionItem.textContent = item;
+                            suggestionItem.addEventListener('click', function () {
+                                input.value = item;
+                                suggestionsBox.innerHTML = '';
+                            });
+                            suggestionsBox.appendChild(suggestionItem);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error); // Log any errors
+                    });
+            } else {
+                suggestionsBox.innerHTML = '';
+            }
+        });
+    });
+});
+main
