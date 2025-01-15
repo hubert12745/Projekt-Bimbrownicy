@@ -28,22 +28,27 @@ ob_start(); ?>
                 <div class="form-group">
                     <label for="wydzial">Wydział</label>
                     <input type="text" id="wydzial" placeholder="np. Wydział Informatyki" />
+                    <div class="suggestions-box"></div>
                 </div>
                 <div class="form-group">
                     <label for="wykladowca">Wykładowca</label>
                     <input type="text" id="wykladowca" placeholder="np. Jan Kowalski" />
+                    <div class="suggestions-box"></div>
                 </div>
                 <div class="form-group">
                     <label for="sala">Sala</label>
                     <input type="text" id="sala" placeholder="np. A101" />
+                    <div class="suggestions-box"></div>
                 </div>
                 <div class="form-group">
                     <label for="przedmiot">Przedmiot</label>
                     <input type="text" id="przedmiot" placeholder="np. Algorytmy" />
+                    <div class="suggestions-box"></div>
                 </div>
                 <div class="form-group">
                     <label for="grupa">Grupa</label>
                     <input type="text" id="grupa" placeholder="np. II Inf 1A" />
+                    <div class="suggestions-box"></div>
                 </div>
                 <div class="form-group">
                     <label for="nrAlbumu">Nr. Albumu</label>
@@ -52,18 +57,22 @@ ob_start(); ?>
                 <div class="form-group">
                     <label for="forma">Forma przedmiotu</label>
                     <input type="text" id="forma" placeholder="np. Wykład, Ćwiczenia" />
+                    <div class="suggestions-box"></div>
                 </div>
                 <div class="form-group">
                     <label for="typStudiow">Typ studiów</label>
                     <input type="text" id="typStudiow" placeholder="np. Stacjonarne" />
+                    <div class="suggestions-box"></div>
                 </div>
                 <div class="form-group">
                     <label for="semestrStudiow">Semestr studiów</label>
                     <input type="text" id="semestrStudiow" placeholder="np. 3" />
+                    <div class="suggestions-box"></div>
                 </div>
                 <div class="form-group">
                     <label for="rokStudiow">Rok studiów</label>
                     <input type="text" id="rokStudiow" placeholder="np. II" />
+                    <div class="suggestions-box"></div>
                 </div>
 
                 <div class="filter-buttons">
