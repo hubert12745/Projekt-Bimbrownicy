@@ -290,7 +290,79 @@ function applyFilters() {
             console.error('Error:', error);
         });
 }
+// Validation functions
+function validateStringNoNumbers(value) {
+    if (/\d/.test(value)) {
+        return `Numbers are not allowed.`;
+    }
+    return '';
+}
 
+function validateIntegerOnly(value) {
+    if (value && !/^\d+$/.test(value)) {
+        return `Please enter a valid integer.`;
+    }
+    return '';
+}
+
+// Function to show validation message
+function showValidationMessage(input, message) {
+    let messageElement = input.nextElementSibling;
+    if (!messageElement || !messageElement.classList.contains('validation-message')) {
+        messageElement = document.createElement('div');
+        messageElement.classList.add('validation-message');
+        input.parentNode.insertBefore(messageElement, input.nextSibling);
+    }
+    messageElement.textContent = message;
+}
+
+// Function to check all validations and enable/disable the button
+function checkValidations() {
+    const filters = [
+        { id: 'wydzial', validate: validateStringNoNumbers },
+        { id: 'wykladowca', validate: validateStringNoNumbers },
+        { id: 'forma', validate: validateStringNoNumbers },
+        { id: 'typStudiow', validate: validateStringNoNumbers },
+        { id: 'semestrStudiow', validate: validateIntegerOnly },
+        { id: 'rokStudiow', validate: validateIntegerOnly }
+    ];
+
+    let allValid = true;
+    filters.forEach(filter => {
+        const input = document.getElementById(filter.id);
+        const message = filter.validate(input.value);
+        showValidationMessage(input, message);
+        if (message) {
+            allValid = false;
+        }
+    });
+
+    document.querySelector('.filter-buttons button[type="button"]').disabled = !allValid;
+}
+
+// Real-time validation for filters
+document.addEventListener('DOMContentLoaded', () => {
+    const filters = [
+        { id: 'wydzial', validate: validateStringNoNumbers },
+        { id: 'wykladowca', validate: validateStringNoNumbers },
+        { id: 'forma', validate: validateStringNoNumbers },
+        { id: 'typStudiow', validate: validateStringNoNumbers },
+        { id: 'semestrStudiow', validate: validateIntegerOnly },
+        { id: 'rokStudiow', validate: validateIntegerOnly }
+    ];
+
+    filters.forEach(filter => {
+        const input = document.getElementById(filter.id);
+        input.addEventListener('input', () => {
+            const message = filter.validate(input.value);
+            showValidationMessage(input, message);
+            checkValidations();
+        });
+    });
+
+    // Initial check to disable the button if needed
+    checkValidations();
+});
 document.addEventListener('DOMContentLoaded', () => {
     // Filtry
     const showFiltersBtn = document.getElementById('showFiltersBtn');
