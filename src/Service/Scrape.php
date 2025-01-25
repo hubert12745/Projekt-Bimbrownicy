@@ -16,7 +16,7 @@ use App\Service\Config;
 function scrape(string $faculty, string $start, string $end): void
 {
     $scrape = new ScrapeData();
-    $scrape->fatchData($faculty, $start, $end);
+    $scrape->fetchData($faculty, $start, $end);
 }
 
 try {

@@ -13,7 +13,7 @@ use App\Model\StudentGroup;
 
 class ScrapeData
 {
-    public function fatchData(string $faculty, string $start, string $end)
+    public function fetchData(string $faculty, string $start, string $end)
     {
         $url = "https://plan.zut.edu.pl/schedule_student.php?kind=apiwi&department={$faculty}&start={$start}&end={$end}";
         $data = file_get_contents($url);
