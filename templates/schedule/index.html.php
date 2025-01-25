@@ -76,7 +76,7 @@ ob_start(); ?>
                 </div>
 
                 <div class="filter-buttons">
-                    <button type="reset">Resetuj filtry</button>
+                    <button type="reset" id="resetFiltersBtn">Resetuj filtry</button>
                     <button type="button" id="filterBtn">Zastosuj filtry</button>
 
                 </div>
@@ -105,16 +105,17 @@ ob_start(); ?>
                     <div class="view-buttons">
                         <input type="date" id="weekPicker">
                         <button id="changeWeekBtn">Pokaż tydzień</button>
-                        <button class="view-button">Semestr</button>
-                        <button class="view-button">Miesiąc</button>
-                        <button class="view-button">Tydzień</button>
-                        <button class="view-button">Dzień</button>
+                        <button id="viewSemesterBtn" class="view-button">Semestr</button>
+                        <button id = "viewMonthBtn" class="view-button">Miesiąc</button>
+                        <button id ="viewWeekBtn" class="view-button">Tydzień</button>
+                        <button id= viewDayBtn class="view-button">Dzień</button>
+                        <div id="monthName" style="font-weight: bold; margin-left: 15px;"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Kontener na tabelę -->
-            <div class="schedule-container">
+            <div class="schedule-container" id="weekView">
                 <table class="schedule-table">
                     <thead>
                     <tr>
@@ -133,6 +134,41 @@ ob_start(); ?>
                     <!-- Wygenerujemy wiersze (7..19) w skrypcie -->
                     </tbody>
                 </table>
+            </div>
+
+            <div class="schedule-container" id="monthView" style="display: none;">
+                <table class="month-table">
+                    <thead>
+                    <tr>
+                        <th>Pon</th>
+                        <th>Wt</th>
+                        <th>Śr</th>
+                        <th>Czw</th>
+                        <th>Pt</th>
+                        <th>Sob</th>
+                        <th>Nd</th>
+                    </tr>
+                    </thead>
+                    <tbody id="month-body"></tbody>
+                </table>
+            </div>
+            <div class="schedule-container" id="dayView" style="display: none;">
+                <table class="schedule-table day-table">
+                    <thead>
+                    <tr>
+                        <th>Godz.</th>
+                        <th id="day-view-header">Dzień (DD.MM.RRRR)</th>
+                    </tr>
+                    </thead>
+                    <tbody id="day-schedule-body">
+                    <!-- Wypełnimy w JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="schedule-container" id="semesterView" style="display: none;">
+                <div class="semester-container" id="semester-container">
+                    <!-- Generowane dynamicznie w JS -->
+                </div>
             </div>
 
             <!-- Przykładowa legenda (opcjonalnie) -->
