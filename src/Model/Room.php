@@ -86,7 +86,7 @@ class Room
     }
 
 
-    public function save(?string $room_name, ?int $faculty_id): void
+    public function save(): void
     {
         $pdo = new PDO(
             Config::get('db_dsn'),
@@ -100,8 +100,8 @@ class Room
         );
 
         $stmt->execute([
-            'room_name'  => $room_name,
-            'faculty_id' => $faculty_id
+            'room_name'  => $this->room_name,
+            'faculty_id' => $this->faculty_id
         ]);
     }
 }

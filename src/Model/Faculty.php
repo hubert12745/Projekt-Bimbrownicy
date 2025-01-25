@@ -56,13 +56,13 @@ class Faculty
         return $faculty;
     }
 
-    public function save($facultyName, $facultyShort)
+    public function save()
     {
         $pdo = new \PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
         $stmt = $pdo->prepare('INSERT OR IGNORE INTO Faculty ( faculty_name, faculty_short) VALUES (:faculty_name, :faculty_short)');
         $stmt->execute([
-            'faculty_name' => $facultyName,
-            'faculty_short' => $facultyShort
+            'faculty_name' => $this->facultyName,
+            'faculty_short' => $this->facultyShort
         ]);
     }
 }

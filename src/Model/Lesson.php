@@ -214,18 +214,7 @@ class Lesson
         return $lesson;
     }
 
-    public function save(
-        ?int $subject_id,
-        ?int $worker_id,
-        ?int $group_id,
-        ?int $room_id,
-        ?string $lesson_description,
-        ?string $lesson_form,
-        ?string $lesson_form_short,
-        ?string $lesson_status,
-        ?string $lesson_start,
-        ?string $lesson_end
-    ): void {
+    public function save(): void {
         $pdo = new \PDO(
             Config::get('db_dsn'),
             Config::get('db_user'),
@@ -259,16 +248,16 @@ class Lesson
         );
 
         $stmt->execute([
-            'subject_id'         => $subject_id,
-            'worker_id'          => $worker_id,
-            'group_id'           => $group_id,
-            'room_id'            => $room_id,
-            'lesson_description' => $lesson_description,
-            'lesson_form'        => $lesson_form,
-            'lesson_form_short'  => $lesson_form_short,
-            'lesson_status'      => $lesson_status,
-            'lesson_start'       => $lesson_start,
-            'lesson_end'         => $lesson_end
+            'subject_id'         => $this->subject_id,
+            'worker_id'          => $this->worker_id,
+            'group_id'           => $this->group_id,
+            'room_id'            => $this->room_id,
+            'lesson_description' => $this->lesson_description,
+            'lesson_form'        => $this->lesson_form,
+            'lesson_form_short'  => $this->lesson_form_short,
+            'lesson_status'      => $this->lesson_status,
+            'lesson_start'       => $this->lesson_start,
+            'lesson_end'         => $this->lesson_end
         ]);
     }
 }

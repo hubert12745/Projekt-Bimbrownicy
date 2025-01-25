@@ -132,14 +132,7 @@ class Worker
         return $worker;
     }
 
-    public function save(
-        ?string $title,
-        ?string $firstName,
-        ?string $lastName,
-        ?string $fullName,
-        ?string $login,
-        ?int $facultyId
-    ): void {
+    public function save(): void {
         $pdo = new PDO(
             Config::get('db_dsn'),
             Config::get('db_user'),
@@ -154,12 +147,12 @@ class Worker
         );
 
         $stmt->execute([
-            'title'      => $title,
-            'first_name' => $firstName,
-            'last_name'  => $lastName,
-            'full_name'  => $fullName,
-            'login'      => $login,
-            'faculty_id' => $facultyId
+            'title'      => $this->title,
+            'first_name' => $this->firstName,
+            'last_name'  => $this->lastName,
+            'full_name'  => $this->fullName,
+            'login'      => $this->login,
+            'faculty_id' => $this->facultyId
         ]);
     }
 }

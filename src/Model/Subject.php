@@ -95,7 +95,7 @@ class Subject
         return $subject;
     }
 
-    public function save(?string $subjectName, ?string $subjectType, ?int $facultyId): void
+    public function save(): void
     {
         $pdo = new PDO(
             Config::get('db_dsn'),
@@ -109,9 +109,9 @@ class Subject
         );
 
         $stmt->execute([
-            'subject_name' => $subjectName,
-            'subject_type' => $subjectType,
-            'faculty_id'   => $facultyId
+            'subject_name' => $this->subjectName,
+            'subject_type' => $this->subjectType,
+            'faculty_id'   => $this->facultyId
         ]);
     }
 }

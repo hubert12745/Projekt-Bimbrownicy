@@ -152,13 +152,13 @@ class ClassGroup
     }
 
     public function save(
-        ?string $groupName,
-        ?int    $year,
-        ?int    $semester,
-        ?int    $facultyId,
-        ?string $faculty,
-        ?string $fieldOfStudy,
-        ?string $typeOfStudy
+//        ?string $groupName,
+//        ?int    $year,
+//        ?int    $semester,
+//        ?int    $facultyId,
+//        ?string $faculty,
+//        ?string $fieldOfStudy,
+//        ?string $typeOfStudy
     ): void
     {
         $pdo = new PDO(
@@ -175,13 +175,13 @@ class ClassGroup
         );
 
         $stmt->execute([
-            'group_name' => $groupName,
-            'year' => $year,
-            'semester' => $semester,
-            'faculty_id' => $facultyId,
-            'department' => $faculty,
-            'field_of_study' => $fieldOfStudy,
-            'type_of_study' => $typeOfStudy
+            'group_name' => $this->groupName,
+            'year' => $this->year,
+            'semester' => $this->semester,
+            'faculty_id' => $this->facultyId,
+            'department' => $this->faculty,
+            'field_of_study' => $this->fieldOfStudy,
+            'type_of_study' => $this->typeOfStudy
         ]);
     }
 }

@@ -23,8 +23,8 @@ try {
     $startTime = microtime(true);
 //    $faculties =  ['WA','WBiHZ','WBiIS','WE','WEkon','WI','WIMiM','WKSiR','WNoZiR','WTMiT','WTiICH'];
     $faculties =  ['WI'];
-    $start = '2025-01-13';
-    $end = '2025-01-14';
+    $start = '2025-01-20';
+    $end = '2025-01-31';
     foreach ($faculties as $faculty) {
         scrape($faculty, $start, $end);
     }
