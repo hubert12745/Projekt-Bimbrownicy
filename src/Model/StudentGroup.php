@@ -30,20 +30,30 @@ class StudentGroup
         $this->groupId = $groupId;
         return $this;
     }
-
-    public function fill($array): Faculty
-    {
-        foreach ($array as $key => $value) {
-            $method = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-            if (method_exists($this, $method)) {
-                $this->$method($value);
-            }
+    private function findId(string $groupName): ?int{
+        $pdo = new \PDO(
+            Config::get('db_dsn'),
+            Config::get('db_user'),
+            Config::get('db_pass')
+        );
+        $stmt = $pdo->prepare('SELECT group_id FROM ClassGroup WHERE group_name = :group_name');
+        $stmt->execute(['group_name' => $groupName]);
+        $groupId = $stmt->fetchColumn();
+        if ($groupId === false) {
+            return null;
         }
+        return (int)$groupId;
+    }
+    public function fill($array): StudentGroup
+    {
+
+        $this->setStudentId($array['student_id']);
+        $this->setGroupId($this->findId($array['group_name'] ?? ''));
 
         return $this;
     }
 
-    public static function fromApi($array): Faculty
+    public static function fromApi($array): StudentGroup
     {
         $faculty = new self();
         $faculty->fill($array);
@@ -53,8 +63,8 @@ class StudentGroup
 
     public function save()
     {
-        $pdo = new PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT INTO StudentGroup (student_id, group_id) VALUES (:student_id, :group_id)');
+        $pdo = new \PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
+        $stmt = $pdo->prepare('INSERT OR IGNORE INTO StudentGroup (student_id, group_id) VALUES (:student_id, :group_id)');
         $stmt->execute([
             'student_id' => $this->studentId,
             'group_id' => $this->groupId
