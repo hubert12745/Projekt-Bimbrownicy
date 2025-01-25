@@ -11,10 +11,10 @@ let currentMonth = new Date();                          // do renderMonth
 let currentDay = new Date();                            // do renderDay
 
 // ---------- SEMESTR ---------- //
-// Rok akademicki, np. 2025 -> semestr zimowy 2025/2026
+// Rok akademicki, np. 2025
 let currentSemesterYear = 2025;
-// 'winter' = paź-list-gru-sty (od października bieżącego roku do stycznia roku+1)
-// 'summer' = luty-mar-kwi-maj-cze (tego samego roku, co w currentSemesterYear)
+// 'winter' = paź (9)..gru(11), sty(0) TEGO SAMEGO roku (lub +1 - zależnie od Twoich potrzeb)
+// 'summer' = luty(1)..czerwiec(5)
 let currentSemester = 'winter';
 
 // Główna tablica eventów — pusta na start (filtrowane z bazy)
@@ -28,18 +28,13 @@ let events = [];
 function getMondayOfCurrentWeek(date) {
     const newDate = new Date(date);
     const day = newDate.getDay(); // 0..6 (niedziela=0, poniedziałek=1, ...)
+
+    // Poniedziałek: diff= (1 - 1)=0  / Niedziela: diff= (1 - 0)=1?
+    // Lepiej uwzględnić, że Sunday=0 => chcemy -6, by cofnąć do poniedziałku
     const diff = (day === 0) ? -6 : (1 - day);
     newDate.setDate(newDate.getDate() + diff);
     newDate.setHours(0,0,0,0);
     return newDate;
-}
-
-/** Format krótkiego nagłówka dnia (np. "pon (20.03)") */
-function formatDayHeader(dateObj, dayIndex) {
-    const dayNames = ["pon", "wt", "śr", "czw", "pt", "sob", "nd"];
-    const dd = String(dateObj.getDate()).padStart(2, '0');
-    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-    return `${dayNames[dayIndex]} (${dd}.${mm})`;
 }
 
 /** Nazwa miesiąca po polsku. */
@@ -51,24 +46,30 @@ function getMonthName(monthIndex) {
     return monthNames[monthIndex] || "";
 }
 
+/** Format krótkiego nagłówka dnia (np. "pon (20.03)") */
+function formatDayHeader(dateObj, dayIndex) {
+    const dayNames = ["pon", "wt", "śr", "czw", "pt", "sob", "nd"];
+    const dd = String(dateObj.getDate()).padStart(2, '0');
+    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+    return `${dayNames[dayIndex]} (${dd}.${mm})`;
+}
+
 /***********************************************
  * FUNKCJA PRZYDZIAŁU "LANES" (obok siebie)
+ * (wykorzystywane w widoku tygodnia i dnia)
  ***********************************************/
-/**
- * Dla widoku tygodnia, dnia i semestru – żeby wydarzenia nakładające się
- * były rysowane obok siebie zamiast jedne na drugich.
- *
- * Sortuje wydarzenia (zakładamy, że już są posortowane po starcie)
- * i przydziela je do ścieżek tak, by dwa nakładające się eventy
- * nie były w tej samej ścieżce (lane).
- *
- * Zwraca obiekt { assignments, laneCount }
- *  assignments = tablica obiektów { event, lane }
- *  laneCount   = liczba ścieżek
- */
 function assignEventLanes(dayEvents) {
+    // W tym algorytmie sortujemy eventy
+    // i staramy się upchnąć je w "lane", by eventy nakładające się
+    // nie były w jednej kolumnie.
+
     const lanes = [];
     const assignments = [];
+
+    // Zakładamy, że dayEvents jest już wstępnie posortowane
+    // lub sortujemy wewnątrz:
+    // dayEvents.sort((a, b) => ...
+    // Ale zwykle już sortujemy w renderowaniu.
 
     for (let ev of dayEvents) {
         const [startH, startM] = ev.start.split(":").map(Number);
@@ -77,19 +78,20 @@ function assignEventLanes(dayEvents) {
         const evEnd   = endH * 60 + endM;
 
         let placedLane = -1;
-        // Szukamy wolnej ścieżki
         for (let i = 0; i < lanes.length; i++) {
             const lastEventInLane = lanes[i][lanes[i].length - 1];
             const [lendH, lendM] = lastEventInLane.end.split(":").map(Number);
             const laneLastEnd = lendH * 60 + lendM;
 
+            // Jeśli to wydarzenie zaczyna się po (lub równo) zakończeniu
+            // ostatniego w danej lane => można tam wstawić
             if (laneLastEnd <= evStart) {
                 placedLane = i;
                 break;
             }
         }
 
-        // Jeśli brak wolnej -> tworzymy nową
+        // Jeśli nie znaleziono wolnej "lane"
         if (placedLane === -1) {
             placedLane = lanes.length;
             lanes.push([]);
@@ -113,6 +115,7 @@ function buildScheduleBody() {
     if (!tbody) return;
     tbody.innerHTML = "";
 
+    // Godziny 7..19 (możesz zmienić zakres)
     for (let hour = 7; hour <= 19; hour++) {
         const tr = document.createElement("tr");
 
@@ -125,7 +128,7 @@ function buildScheduleBody() {
         for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
             const td = document.createElement("td");
             td.id = `day${dayIndex}-hour${hour}`;
-            td.style.position = "relative"; // dla absolute eventów
+            td.style.position = "relative";
             tr.appendChild(td);
         }
         tbody.appendChild(tr);
@@ -174,7 +177,7 @@ function renderWeek(filteredEvents = events) {
         dayHeader.textContent = formatDayHeader(thisDay, i);
     }
 
-    // Grupujemy wydarzenia: osobno dla każdego dnia (0..6)
+    // Grupujemy wydarzenia: osobno dla każdego dnia 0..6
     const eventsByDay = [[], [], [], [], [], [], []];
 
     filteredEvents.forEach(ev => {
@@ -189,15 +192,14 @@ function renderWeek(filteredEvents = events) {
     // Dla każdego dnia sortujemy, przydzielamy lane, rysujemy
     for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
         const dayEvents = eventsByDay[dayIndex];
-        // sort po starcie
         dayEvents.sort((a, b) => {
             const [aH,aM] = a.start.split(":").map(Number);
             const [bH,bM] = b.start.split(":").map(Number);
             return (aH*60 + aM) - (bH*60 + bM);
         });
+
         const { assignments, laneCount } = assignEventLanes(dayEvents);
-        // Rysujemy
-        assignments.forEach(({event, lane}) => {
+        assignments.forEach(({ event, lane }) => {
             drawEventInCellsWithLane(dayIndex, event, lane, laneCount);
         });
     }
@@ -210,7 +212,6 @@ function drawEventInCellsWithLane(dayIndex, event, lane, laneCount) {
     const startTotal = startHour*60 + startMin;
     const endTotal   = endHour*60 + endMin;
 
-    // Komórka bazowa = wiersz startHour
     const cellId = `day${dayIndex}-hour${startHour}`;
     const td = document.getElementById(cellId);
     if (!td) return;
@@ -220,7 +221,7 @@ function drawEventInCellsWithLane(dayIndex, event, lane, laneCount) {
     const duration  = endTotal - startTotal;
     const blockHeight = (duration / 60) * rowHeight;
 
-    // Obliczamy szerokość i przesunięcie w poziomie
+    // obliczamy szerokość
     const laneWidthPercent = 100 / laneCount;
     const leftPercent = laneWidthPercent * lane;
 
@@ -234,7 +235,7 @@ function drawEventInCellsWithLane(dayIndex, event, lane, laneCount) {
     div.style.width = laneWidthPercent + "%";
     div.title = `Tytuł: ${event.title}\nGodziny: ${event.start} - ${event.end}\nTyp: ${event.type}`;
 
-    // Dodatkowe elementy
+    // Treść w środku
     const titleDiv = document.createElement("div");
     titleDiv.classList.add("event-title");
     titleDiv.textContent = event.title;
@@ -288,7 +289,7 @@ function addEvent() {
 }
 
 /***********************************************
- * RENDEROWANIE MIESIĄCA (STARY SPOSÓB)
+ * RENDEROWANIE MIESIĄCA
  ***********************************************/
 function renderMonth(filteredEvents = events) {
     const year = currentMonth.getFullYear();
@@ -322,8 +323,10 @@ function renderMonth(filteredEvents = events) {
             if (cellIndex >= offset && dayCounter <= daysInMonth) {
                 const dayNumber = dayCounter;
                 td.innerHTML = `<div class="day-number">${dayNumber}</div>`;
+
                 const cellDate = new Date(year, month, dayNumber);
                 drawEventsInMonthCell(td, cellDate, filteredEvents);
+
                 dayCounter++;
             } else {
                 td.classList.add("inactive");
@@ -335,8 +338,8 @@ function renderMonth(filteredEvents = events) {
 }
 
 /**
- * Stary sposób: pionowa lista wydarzeń w komórce, + link 'więcej'
- * bez rozkładania eventów obok siebie.
+ * Funkcja używana w widoku "miesiąc", ale też ją użyjemy w semestrze.
+ * Wypełnia komórkę listą eventów (z linkiem "+x więcej").
  */
 function drawEventsInMonthCell(td, cellDate, eventsArray) {
     const y = cellDate.getFullYear();
@@ -417,7 +420,7 @@ function drawEventsInMonthCell(td, cellDate, eventsArray) {
 }
 
 /***********************************************
- * RENDEROWANIE DNIA (Z LANE)
+ * RENDEROWANIE DNIA
  ***********************************************/
 function renderDay(filteredEvents = events) {
     const dayTbody = document.getElementById("day-schedule-body");
@@ -432,7 +435,6 @@ function renderDay(filteredEvents = events) {
         dayHeader.textContent = `Dzień (${dd}.${mm}.${yyyy})`;
     }
 
-    // godziny 7..19
     for (let hour = 7; hour <= 19; hour++) {
         const tr = document.createElement("tr");
 
@@ -443,30 +445,26 @@ function renderDay(filteredEvents = events) {
         const eventTd = document.createElement("td");
         eventTd.id = `day-${hour}`;
         eventTd.style.position = "relative";
-        eventTd.style.overflow = "visible";
         tr.appendChild(eventTd);
 
         dayTbody.appendChild(tr);
     }
 
-    // Wstaw eventy
+    // Filtrujemy eventy na ten konkretny dzień
     const y = currentDay.getFullYear();
     const m = String(currentDay.getMonth()+1).padStart(2,'0');
     const d = String(currentDay.getDate()).padStart(2,'0');
     const dayStr = `${y}-${m}-${d}`;
 
     const dayEvents = filteredEvents.filter(ev => ev.date === dayStr);
-    // sortujemy
     dayEvents.sort((a,b) => {
         const [aH,aM] = a.start.split(":").map(Number);
         const [bH,bM] = b.start.split(":").map(Number);
         return (aH*60 + aM) - (bH*60 + bM);
     });
 
-    // lane
     const { assignments, laneCount } = assignEventLanes(dayEvents);
 
-    // rysujemy
     assignments.forEach(({event, lane}) => {
         drawDayEventWithLane(event, lane, laneCount);
     });
@@ -486,7 +484,6 @@ function drawDayEventWithLane(event, lane, laneCount) {
     const duration  = endTotal - startTotal;
     const blockHeight = (duration/60)*rowHeight;
 
-    // szerokość i przesunięcie
     const laneWidth = 100 / laneCount;
     const leftOffset = laneWidth * lane;
 
@@ -537,232 +534,150 @@ function highlightTodayDay() {
 }
 
 /***********************************************
- * RENDEROWANIE SEMESTRU (Z LANE)
+ * WIDOK SEMESTRALNY (jako kilka miesięcy obok siebie)
  ***********************************************/
 
 /**
- * Funkcja zwraca listę obiektów {year, month}, określających które
- * miesiące należą do obecnego semestru 'winter' / 'summer'
- * w roku akademickim `currentSemesterYear`.
- *
- *  - Zimowy: paź (9), lis (10), gru (11) danego roku + styczeń (0) kolejnego.
- *  - Letni: luty(1)..czerwiec(5) TEGO SAMEGO roku,
- *    żeby np. semestr letni 2025 pokazywał luty–czerwiec 2025.
+ * Zwraca listę obiektów {year, month}, określających miesiące w obecnym semestrze.
+ * np. dla semestru zimowego i currentSemesterYear=2025 => paź, lis, gru (2025), sty (2025)
  */
 function getMonthsForCurrentSemester() {
     if (currentSemester === 'winter') {
-        // paź, lis, gru => currentSemesterYear
-        // styczeń => currentSemesterYear + 1
         return [
-            { year: currentSemesterYear,   month: 9 },
-            { year: currentSemesterYear,   month: 10 },
-            { year: currentSemesterYear,   month: 11 },
-            { year: currentSemesterYear+1, month: 0 },
+            { year: currentSemesterYear, month: 9 },  // paź
+            { year: currentSemesterYear, month: 10 }, // lis
+            { year: currentSemesterYear, month: 11 }, // gru
+            // Jeżeli chcesz styczeń w roku +1 => użyj: { year: currentSemesterYear + 1, month: 0 }
+            { year: currentSemesterYear, month: 0 }   // sty
         ];
     } else {
-        // 'summer': luty..czerwiec TEGO SAMEGO roku
+        // 'summer': luty..czerwiec
         return [
-            { year: currentSemesterYear, month: 1 },
-            { year: currentSemesterYear, month: 2 },
-            { year: currentSemesterYear, month: 3 },
-            { year: currentSemesterYear, month: 4 },
-            { year: currentSemesterYear, month: 5 },
+            { year: currentSemesterYear, month: 1 },  // luty
+            { year: currentSemesterYear, month: 2 },  // marzec
+            { year: currentSemesterYear, month: 3 },  // kwiecień
+            { year: currentSemesterYear, month: 4 },  // maj
+            { year: currentSemesterYear, month: 5 },  // czerwiec
         ];
     }
 }
 
-/** Renderuje cały widok semestralny (kilka "mini-miesięcy") */
-function renderSemester(filteredEvents = events) {
+/**
+ * Nowy widok semestralny = kilka "mini-widoków miesięcznych" obok siebie
+ * z taką samą logiką rysowania eventów jak w "renderMonth".
+ */
+function renderSemesterAsMonths(filteredEvents = events) {
     const semesterContainer = document.getElementById('semester-container');
     if (!semesterContainer) return;
     semesterContainer.innerHTML = '';
 
-    // Pobieramy listę miesięcy
+    // Lista miesięcy w semestrze
     const months = getMonthsForCurrentSemester();
 
-    months.forEach(({year, month}) => {
-        const block = renderOneSemesterMonth(year, month, filteredEvents);
-        semesterContainer.appendChild(block);
-    });
-}
+    // (Możesz też ustawić w CSS: .semester-container { display: flex; gap: 20px; }
+    semesterContainer.style.display = 'flex';
+    semesterContainer.style.gap = '20px';
 
-/** Renderuje pojedynczy "mini-miesiąc" w semestrze. */
-function renderOneSemesterMonth(year, month, eventsArray) {
-    const firstDayOfMonth = new Date(year, month, 1);
+    months.forEach(({ year, month }) => {
+        // Główny blok
+        const block = document.createElement('div');
+        block.classList.add('semester-month-block');
 
-    // Kontener
-    const block = document.createElement('div');
-    block.classList.add('semester-month-block');
+        // Tytuł miesiąca, np. "Październik 2025"
+        const heading = document.createElement('h3');
+        heading.textContent = `${getMonthName(month)} ${year}`;
+        block.appendChild(heading);
 
-    // Nagłówek np. "Październik 2025"
-    const header = document.createElement('div');
-    header.classList.add('semester-month-header');
-    header.textContent = `${getMonthName(month)} ${year}`;
-    block.appendChild(header);
+        // Tabelka identyczna jak w "renderMonth"
+        const table = document.createElement('table');
+        table.classList.add('month-table');
 
-    // Tabela
-    const table = document.createElement('table');
-    table.classList.add('semester-month-table');
+        // Thead
+        const thead = document.createElement('thead');
+        const daysRow = document.createElement('tr');
+        const dayNames = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
+        dayNames.forEach(dn => {
+            const th = document.createElement('th');
+            th.textContent = dn;
+            daysRow.appendChild(th);
+        });
+        thead.appendChild(daysRow);
+        table.appendChild(thead);
 
-    // Thead z dniami tygodnia
-    const thead = document.createElement('thead');
-    const row = document.createElement('tr');
-    const dayNames = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
-    dayNames.forEach(dn => {
-        const th = document.createElement('th');
-        th.textContent = dn;
-        row.appendChild(th);
-    });
-    thead.appendChild(row);
-    table.appendChild(thead);
+        // Tbody
+        const tbody = document.createElement('tbody');
+        table.appendChild(tbody);
 
-    // Tbody
-    const tbody = document.createElement('tbody');
-    const daysInMonth = new Date(year, month+1, 0).getDate();
+        // Liczymy dni w miesiącu
+        const firstDay = new Date(year, month, 1);
+        const daysInMonth = new Date(year, month+1, 0).getDate();
 
-    let startDay = firstDayOfMonth.getDay();
-    if (startDay === 0) startDay = 7;
-    const offset = startDay - 1;
-    const totalCells = offset + daysInMonth;
-    const rows = Math.ceil(totalCells / 7);
+        let startDay = firstDay.getDay();
+        if (startDay === 0) startDay = 7; // w JS niedziela=0
+        const offset = startDay - 1;
+        const totalCells = offset + daysInMonth;
+        const rows = Math.ceil(totalCells / 7);
 
-    let dayCounter = 1;
-    for (let r = 0; r < rows; r++) {
-        const tr = document.createElement('tr');
-        for (let c = 0; c < 7; c++) {
-            const td = document.createElement('td');
-            td.style.position = "relative";
-            td.style.height = "80px";  // np. 80px, aby zmieścić eventy
-            td.style.overflow = "hidden";
-            const cellIndex = r*7 + c;
+        let dayCounter = 1;
+        for (let r = 0; r < rows; r++) {
+            const tr = document.createElement('tr');
+            for (let c = 0; c < 7; c++) {
+                const td = document.createElement('td');
+                const cellIndex = r*7 + c;
 
-            if (cellIndex >= offset && dayCounter <= daysInMonth) {
-                const thisDay = dayCounter;
-                // Numer dnia
-                const dayDiv = document.createElement('div');
-                dayDiv.classList.add('day-number');
-                dayDiv.textContent = thisDay;
-                td.appendChild(dayDiv);
+                if (cellIndex >= offset && dayCounter <= daysInMonth) {
+                    const dayNumber = dayCounter;
 
-                const cellDate = new Date(year, month, thisDay);
+                    // Numer dnia
+                    const dayDiv = document.createElement('div');
+                    dayDiv.classList.add('day-number');
+                    dayDiv.textContent = dayNumber;
+                    td.appendChild(dayDiv);
 
-                // Podświetlenie "dzisiaj"
-                const today = new Date();
-                today.setHours(0,0,0,0);
-                if (cellDate.toDateString() === today.toDateString()) {
-                    td.classList.add('todayHighlight');
+                    const cellDate = new Date(year, month, dayNumber);
+                    drawEventsInMonthCell(td, cellDate, filteredEvents);
+
+                    dayCounter++;
+                } else {
+                    td.classList.add('inactive');
                 }
-
-                // Wstaw eventy
-                drawSemesterEventsInCell(td, cellDate, eventsArray);
-
-                dayCounter++;
-            } else {
-                td.classList.add('inactive');
+                tr.appendChild(td);
             }
-            tr.appendChild(td);
+            tbody.appendChild(tr);
         }
-        tbody.appendChild(tr);
-    }
 
-    table.appendChild(tbody);
-    block.appendChild(table);
-    return block;
-}
-
-/**
- * Wstawia wydarzenia do komórki w semestrze z rozkładaniem obok siebie
- * (podobnie jak w widoku tygodnia/dnia).
- */
-function drawSemesterEventsInCell(td, cellDate, eventsArray) {
-    const y = cellDate.getFullYear();
-    const m = String(cellDate.getMonth()+1).padStart(2,'0');
-    const d = String(cellDate.getDate()).padStart(2,'0');
-    const cellDateStr = `${y}-${m}-${d}`;
-
-    const dayEvents = eventsArray.filter(ev => ev.date === cellDateStr);
-    if (dayEvents.length === 0) return;
-
-    // sort
-    dayEvents.sort((a,b) => {
-        const [aH,aM] = a.start.split(":").map(Number);
-        const [bH,bM] = b.start.split(":").map(Number);
-        return (aH*60 + aM) - (bH*60 + bM);
-    });
-
-    const { assignments, laneCount } = assignEventLanes(dayEvents);
-
-    // rysujemy w 80px wysokości, 24h
-    const cellHeight = parseFloat(td.style.height) || 80;
-    const minutesInDay = 24*60;
-    const pxPerMin = cellHeight / minutesInDay;
-
-    assignments.forEach(({event, lane}) => {
-        const [startH, startM] = event.start.split(":").map(Number);
-        const [endH, endM] = event.end.split(":").map(Number);
-        const startTotal = startH*60 + startM;
-        const endTotal   = endH*60 + endM;
-        const duration   = endTotal - startTotal;
-
-        const offsetTop = startTotal * pxPerMin;
-        const blockHeight = duration * pxPerMin;
-
-        const laneWidth = 100 / laneCount;
-        const leftOffset = laneWidth * lane;
-
-        const div = document.createElement('div');
-        div.classList.add('semester-event-item', event.type);
-        div.style.position = "absolute";
-        div.style.top = offsetTop + "px";
-        div.style.height = blockHeight + "px";
-        div.style.left = leftOffset + "%";
-        div.style.width = laneWidth + "%";
-        div.title = `Tytuł: ${event.title}\nGodziny: ${event.start} - ${event.end}\nTyp: ${event.type}`;
-
-        // Prosta zawartość
-        const titleDiv = document.createElement("div");
-        titleDiv.classList.add("event-title");
-        titleDiv.textContent = event.title;
-        titleDiv.style.fontSize = "10px";
-
-        const timeDiv = document.createElement("div");
-        timeDiv.classList.add("event-time");
-        timeDiv.textContent = event.start;
-        timeDiv.style.fontSize = "10px";
-
-        div.appendChild(titleDiv);
-        div.appendChild(timeDiv);
-
-        td.appendChild(div);
+        block.appendChild(table);
+        semesterContainer.appendChild(block);
     });
 }
 
 /**
  * shiftSemester(+1) => przejście do następnego semestru
- * shiftSemester(-1) => poprzedniego
+ * shiftSemester(-1) => poprzedniego semestru
+ * (możesz dostosować do własnych potrzeb)
  */
 function shiftSemester(direction) {
     if (currentSemester === 'winter') {
         if (direction === 1) {
-            // z zimowego 2025 do letniego 2025
+            // z zimowego do letniego
             currentSemester = 'summer';
         } else {
-            // z zimowego 2025 do letniego 2024
+            // z zimowego do letniego poprzedniego roku
             currentSemester = 'summer';
             currentSemesterYear -= 1;
         }
     } else {
         // 'summer'
         if (direction === 1) {
-            // z letniego 2025 do zimowego 2026
+            // z letniego do zimowego następnego roku
             currentSemester = 'winter';
             currentSemesterYear += 1;
         } else {
-            // z letniego 2025 do zimowego 2025
+            // z letniego do zimowego tego samego roku
             currentSemester = 'winter';
         }
     }
-    renderSemester();
+    renderSemesterAsMonths();
 }
 
 /***********************************************
@@ -772,15 +687,16 @@ function shiftSemester(direction) {
 /** Zastosuj filtry (przykładowy mechanizm) */
 function applyFilters() {
     const filters = {
-        wydzial: document.getElementById('wydzial').value,
-        wykladowca: document.getElementById('wykladowca').value,
-        sala: document.getElementById('sala').value,
-        przedmiot: document.getElementById('przedmiot').value,
-        grupa: document.getElementById('grupa').value,
-        forma: document.getElementById('forma').value,
-        typStudiow: document.getElementById('typStudiow').value,
-        semestrStudiow: document.getElementById('semestrStudiow').value,
-        rokStudiow: document.getElementById('rokStudiow').value
+        wydzial: document.getElementById('wydzial')?.value || '',
+        wykladowca: document.getElementById('wykladowca')?.value || '',
+        sala: document.getElementById('sala')?.value || '',
+        przedmiot: document.getElementById('przedmiot')?.value || '',
+        grupa: document.getElementById('grupa')?.value || '',
+        nrAlbumu: document.getElementById('nrAlbumu')?.value || '',
+        forma: document.getElementById('forma')?.value || '',
+        typStudiow: document.getElementById('typStudiow')?.value || '',
+        semestrStudiow: document.getElementById('semestrStudiow')?.value || '',
+        rokStudiow: document.getElementById('rokStudiow')?.value || ''
     };
 
     const queryString = new URLSearchParams(filters).toString();
@@ -836,12 +752,12 @@ function renderAccordingToCurrentView() {
             highlightTodayDay();
             break;
         case 'semester':
-            renderSemester();
+            renderSemesterAsMonths();
             break;
     }
 }
 
-/** Walidacje: np. brak cyfr, tylko liczby, itd. */
+/** Walidacje proste */
 function validateStringNoNumbers(value) {
     if (/\d/.test(value)) {
         return `Numbers are not allowed.`;
@@ -919,12 +835,6 @@ function addFavourite() {
     alert("Filtry zapisane w ulubionych!");
 }
 
-/**
- * Wczytanie ulubionych do listy przycisków.
- * Po kliknięciu:
- *  - ustawiamy wartości w inputach
- *  - natychmiast wywołujemy applyFilters()
- */
 function refreshFavouritesList() {
     const favList = document.getElementById('buttonList');
     if (!favList) return;
@@ -976,20 +886,13 @@ function shareSchedule() {
     prompt("Skopiuj ten URL, aby podzielić się planem:", shareUrl);
 }
 
-/**
- * Reset filtrów:
- *  - Czyści wszystkie inputy
- *  - Czyści tablicę events
- *  - Przerysowuje kalendarz (pusty)
- */
+/** Reset filtrów */
 function resetFilters() {
-    // Lista wszystkich pól do wyczyszczenia
     const filterIds = [
         'wydzial', 'wykladowca', 'sala', 'przedmiot',
-        'grupa', 'forma', 'typStudiow', 'semestrStudiow', 'rokStudiow'
+        'grupa', 'nrAlbumu', 'forma', 'typStudiow', 'semestrStudiow', 'rokStudiow'
     ];
 
-    // Czyszczenie pól
     filterIds.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
@@ -997,10 +900,7 @@ function resetFilters() {
         }
     });
 
-    // Wyczyszczenie globalnej listy wydarzeń
     events = [];
-
-    // Przerysowanie kalendarza (bez wydarzeń)
     renderAccordingToCurrentView();
 }
 
@@ -1008,6 +908,7 @@ function resetFilters() {
  * GŁÓWNY DOMContentLoaded
  ***********************************************/
 document.addEventListener('DOMContentLoaded', () => {
+
     // Walidacje w czasie rzeczywistym
     const filtersToValidate = [
         { id: 'wydzial', validate: validateStringNoNumbers },
@@ -1058,7 +959,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetFiltersBtn.addEventListener('click', resetFilters);
     }
 
-    // Wyszukiwarki (dla sugestii)
+    // Inputy z sugestiami
     const filterIds = [
         'wydzial','wykladowca','sala','przedmiot','grupa',
         'forma','typStudiow','semestrStudiow','rokStudiow'
@@ -1145,7 +1046,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('semesterView').style.display = 'block';
 
             currentView = 'semester';
-            renderSemester();
+            renderSemesterAsMonths();
         });
     }
 
@@ -1207,9 +1108,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderDay();
                 highlightTodayDay();
             } else if (currentView === 'semester') {
-                currentSemesterYear = 2025;
+                // Ustal semestr na "zimowy" i rok na obecny itp. – dowolna logika
                 currentSemester = 'winter';
-                renderSemester();
+                currentSemesterYear = new Date().getFullYear();
+                renderSemesterAsMonths();
             } else {
                 // Tydzień
                 currentMonday = getMondayOfCurrentWeek(new Date());
@@ -1219,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // "Pokaż tydzień" z datePicker (lub dzień, semestr, zależnie od widoku)
+    // "Pokaż tydzień" z datePicker (lub dzień, semestr, w zależności od currentView)
     const changeWeekBtn = document.getElementById('changeWeekBtn');
     if (changeWeekBtn) {
         changeWeekBtn.addEventListener('click', () => {
@@ -1238,10 +1140,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderDay();
                 highlightTodayDay();
             } else if (currentView === 'semester') {
-                // Przykładowo wymuszenie semestru zimowego i roku na podstawie daty:
-                currentSemesterYear = selectedDate.getFullYear();
+                // Przykładowo: semestr zimowy w roku wybranej daty (możesz zmodyfikować)
                 currentSemester = 'winter';
-                renderSemester();
+                currentSemesterYear = selectedDate.getFullYear();
+                renderSemesterAsMonths();
             } else {
                 currentMonday = getMondayOfCurrentWeek(selectedDate);
                 renderWeek();
@@ -1257,6 +1159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sala').value = urlParams.get('sala') || '';
     document.getElementById('przedmiot').value = urlParams.get('przedmiot') || '';
     document.getElementById('grupa').value = urlParams.get('grupa') || '';
+    document.getElementById('nrAlbumu').value = urlParams.get('nrAlbumu') || '';
     document.getElementById('forma').value = urlParams.get('forma') || '';
     document.getElementById('typStudiow').value = urlParams.get('typStudiow') || '';
     document.getElementById('semestrStudiow').value = urlParams.get('semestrStudiow') || '';

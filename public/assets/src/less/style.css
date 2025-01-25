@@ -453,13 +453,13 @@ main {
    WIDOK SEMESTRALNY (Semester View)
 ========================================= */
 .semester-container {
-    display: flex;
-    gap: 40px;
+    display: flex;       /* lub zrobisz inline w JS */
+    gap: 20px;
     /* Możesz dodać: flex-wrap: wrap; justify-content: center; */
 }
 
 .semester-month-block {
-    width: 300px; /* np. większa szerokość */
+    width: 280px;  /* np. większa szerokość */
     border: 1px solid #ddd;
     margin: 10px;
 }
