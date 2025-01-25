@@ -652,32 +652,24 @@ function shiftSemester(direction) {
 /** Zastosuj filtry (przykładowy mechanizm) */
 function applyFilters() {
     const filters = {
-        wydzial: document.getElementById('wydzial')?.value || '',
-        wykladowca: document.getElementById('wykladowca')?.value || '',
-        sala: document.getElementById('sala')?.value || '',
-        przedmiot: document.getElementById('przedmiot')?.value || '',
-        grupa: document.getElementById('grupa')?.value || '',
-        forma: document.getElementById('forma')?.value || '',
-        typStudiow: document.getElementById('typStudiow')?.value || '',
-        semestrStudiow: document.getElementById('semestrStudiow')?.value || '',
-        rokStudiow: document.getElementById('rokStudiow')?.value || ''
+        wydzial: document.getElementById('wydzial').value,
+        wykladowca: document.getElementById('wykladowca').value,
+        sala: document.getElementById('sala').value,
+        przedmiot: document.getElementById('przedmiot').value,
+        grupa: document.getElementById('grupa').value,
+        forma: document.getElementById('forma').value,
+        typStudiow: document.getElementById('typStudiow').value,
+        semestrStudiow: document.getElementById('semestrStudiow').value,
+        rokStudiow: document.getElementById('rokStudiow').value
     };
 
     const queryString = new URLSearchParams(filters).toString();
+
     fetch(`/assets/scripts/FiltersLogic.php?${queryString}`)
         .then(response => response.json())
         .then(data => {
-            if (currentView === 'week') {
-                renderWeek(data);
-                highlightToday();
-            } else if (currentView === 'month') {
-                renderMonth(data);
-            } else if (currentView === 'day') {
-                renderDay(data);
-                highlightTodayDay();
-            } else if (currentView === 'semester') {
-                renderSemester(data);
-            }
+            console.log('Returned data:', data); // Log the returned data
+            renderWeek(data);
         })
         .catch(error => {
             console.error('Error:', error);
