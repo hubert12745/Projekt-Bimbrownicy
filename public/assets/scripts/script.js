@@ -16,44 +16,8 @@ let currentSemesterYear = 2025;
 // 'winter' = paź-list-gru-sty, 'summer' = luty-mar-kwi-maj-cze
 let currentSemester = 'winter';
 
-// Przykładowe wydarzenia
-const events = [
-    {
-        date: "2025-10-10",   // YYYY-MM-DD
-        start: "07:15",
-        end: "08:50",
-        type: "wyklad",
-        title: "Wykład poranny"
-    },
-    {
-        date: "2025-10-20",
-        start: "10:15",
-        end: "12:00",
-        type: "lab",
-        title: "Sieci komputerowe (L)"
-    },
-    {
-        date: "2025-11-05",
-        start: "08:15",
-        end: "11:00",
-        type: "projekt",
-        title: "Inżynieria projekt zespołowy"
-    },
-    {
-        date: "2026-01-21",
-        start: "14:15",
-        end: "18:00",
-        type: "lektorat",
-        title: "Język angielski 2 (Lek.)"
-    },
-    {
-        date: "2026-03-10",
-        start: "18:15",
-        end: "19:00",
-        type: "lektorat",
-        title: "Język angielski 3 (Lek.)"
-    },
-];
+// Główna tablica eventów — pusta na start (filtrowane z bazy)
+let events = [];
 
 /***********************************************
  * FUNKCJE POMOCNICZE
@@ -87,6 +51,60 @@ function getMonthName(monthIndex) {
 }
 
 /***********************************************
+ * FUNKCJA PRZYDZIAŁU "LANES" (obok siebie)
+ ***********************************************/
+/**
+ * Dla widoku tygodnia, dnia i semestru – żeby wydarzenia nakładające się
+ * były rysowane obok siebie zamiast jedne na drugich.
+ *
+ * Sortuje wydarzenia (zakładamy, że już są posortowane po starcie)
+ * i przydziela je do ścieżek tak, by dwa nakładające się eventy
+ * nie były w tej samej ścieżce (lane).
+ *
+ * Zwraca obiekt { assignments, laneCount }
+ *  assignments = tablica obiektów { event, lane }
+ *  laneCount   = liczba ścieżek
+ */
+function assignEventLanes(dayEvents) {
+    const lanes = [];
+    const assignments = [];
+
+    for (let ev of dayEvents) {
+        const [startH, startM] = ev.start.split(":").map(Number);
+        const [endH, endM] = ev.end.split(":").map(Number);
+        const evStart = startH * 60 + startM;
+        const evEnd   = endH * 60 + endM;
+
+        let placedLane = -1;
+        // Szukamy wolnej ścieżki
+        for (let i = 0; i < lanes.length; i++) {
+            const lastEventInLane = lanes[i][lanes[i].length - 1];
+            const [lendH, lendM] = lastEventInLane.end.split(":").map(Number);
+            const laneLastEnd = lendH * 60 + lendM;
+
+            if (laneLastEnd <= evStart) {
+                placedLane = i;
+                break;
+            }
+        }
+
+        // Jeśli brak wolnej -> tworzymy nową
+        if (placedLane === -1) {
+            placedLane = lanes.length;
+            lanes.push([]);
+        }
+
+        lanes[placedLane].push(ev);
+        assignments.push({ event: ev, lane: placedLane });
+    }
+
+    return {
+        assignments,
+        laneCount: lanes.length
+    };
+}
+
+/***********************************************
  * RENDEROWANIE TYGODNIA
  ***********************************************/
 function buildScheduleBody() {
@@ -106,6 +124,7 @@ function buildScheduleBody() {
         for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
             const td = document.createElement("td");
             td.id = `day${dayIndex}-hour${hour}`;
+            td.style.position = "relative"; // dla absolute eventów
             tr.appendChild(td);
         }
         tbody.appendChild(tr);
@@ -154,42 +173,77 @@ function renderWeek(filteredEvents = events) {
         dayHeader.textContent = formatDayHeader(thisDay, i);
     }
 
-    // Wstaw wydarzenia
+    // Grupujemy wydarzenia: osobno dla każdego dnia (0..6)
+    const eventsByDay = [[], [], [], [], [], [], []];
+
     filteredEvents.forEach(ev => {
         const evDate = new Date(ev.date);
         const diffDays = (evDate - currentMonday) / (1000*60*60*24);
         if (diffDays >= 0 && diffDays < 7) {
             const dayIndex = Math.floor(diffDays);
-            drawEventInCells(dayIndex, ev);
+            eventsByDay[dayIndex].push(ev);
         }
     });
+
+    // Dla każdego dnia sortujemy, przydzielamy lane, rysujemy
+    for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+        const dayEvents = eventsByDay[dayIndex];
+        // sort po starcie
+        dayEvents.sort((a, b) => {
+            const [aH,aM] = a.start.split(":").map(Number);
+            const [bH,bM] = b.start.split(":").map(Number);
+            return (aH*60 + aM) - (bH*60 + bM);
+        });
+        const { assignments, laneCount } = assignEventLanes(dayEvents);
+        // Rysujemy
+        assignments.forEach(({event, lane}) => {
+            drawEventInCellsWithLane(dayIndex, event, lane, laneCount);
+        });
+    }
 }
 
-function drawEventInCells(dayIndex, event) {
+function drawEventInCellsWithLane(dayIndex, event, lane, laneCount) {
     const [startHour, startMin] = event.start.split(":").map(Number);
     const [endHour, endMin] = event.end.split(":").map(Number);
 
     const startTotal = startHour*60 + startMin;
     const endTotal   = endHour*60 + endMin;
 
+    // Komórka bazowa = wiersz startHour
     const cellId = `day${dayIndex}-hour${startHour}`;
     const td = document.getElementById(cellId);
     if (!td) return;
 
-    const rowHeight = 60;
+    const rowHeight = 60; // 1 godz. = 60px
     const offsetTop = (startMin / 60) * rowHeight;
     const duration  = endTotal - startTotal;
     const blockHeight = (duration / 60) * rowHeight;
 
+    // Obliczamy szerokość i przesunięcie w poziomie
+    const laneWidthPercent = 100 / laneCount;
+    const leftPercent = laneWidthPercent * lane;
+
+    // Stworzenie diva
     const div = document.createElement("div");
     div.classList.add("event-block", event.type);
-    div.textContent = `${event.title} (${event.start} - ${event.end})`;
     div.style.position = "absolute";
     div.style.top = offsetTop + "px";
     div.style.height = blockHeight + "px";
-    div.style.left = "2px";
-    div.style.right = "2px";
+    div.style.left = leftPercent + "%";
+    div.style.width = laneWidthPercent + "%";
     div.title = `Tytuł: ${event.title}\nGodziny: ${event.start} - ${event.end}\nTyp: ${event.type}`;
+
+    // Dodatkowe elementy
+    const titleDiv = document.createElement("div");
+    titleDiv.classList.add("event-title");
+    titleDiv.textContent = event.title;
+
+    const timeDiv = document.createElement("div");
+    timeDiv.classList.add("event-time");
+    timeDiv.textContent = `${event.start} - ${event.end}`;
+
+    div.appendChild(titleDiv);
+    div.appendChild(timeDiv);
 
     td.appendChild(div);
 }
@@ -229,12 +283,11 @@ function addEvent() {
         title
     });
 
-    renderWeek();
-    highlightToday();
+    renderAccordingToCurrentView();
 }
 
 /***********************************************
- * RENDEROWANIE MIESIĄCA
+ * RENDEROWANIE MIESIĄCA (STARY SPOSÓB)
  ***********************************************/
 function renderMonth(filteredEvents = events) {
     const year = currentMonth.getFullYear();
@@ -280,6 +333,10 @@ function renderMonth(filteredEvents = events) {
     }
 }
 
+/**
+ * Stary sposób: pionowa lista wydarzeń w komórce, + link 'więcej'
+ * bez rozkładania eventów obok siebie.
+ */
 function drawEventsInMonthCell(td, cellDate, eventsArray) {
     const y = cellDate.getFullYear();
     const m = String(cellDate.getMonth()+1).padStart(2,'0');
@@ -293,10 +350,22 @@ function drawEventsInMonthCell(td, cellDate, eventsArray) {
     eventsContainer.classList.add('month-events-container');
 
     const MAX_VISIBLE = 2;
-    dayEvents.slice(0,MAX_VISIBLE).forEach(ev => {
+    dayEvents.slice(0, MAX_VISIBLE).forEach(ev => {
         const evDiv = document.createElement('div');
         evDiv.classList.add('event-item', ev.type);
-        evDiv.textContent = `${ev.title} (${ev.start})`;
+
+        // Tytuł + godzina
+        const titleDiv = document.createElement("div");
+        titleDiv.classList.add("event-title");
+        titleDiv.textContent = ev.title;
+
+        const timeDiv = document.createElement("div");
+        timeDiv.classList.add("event-time");
+        timeDiv.textContent = ev.start;
+
+        evDiv.appendChild(titleDiv);
+        evDiv.appendChild(timeDiv);
+
         evDiv.title = `Tytuł: ${ev.title}\nGodziny: ${ev.start} - ${ev.end}\nTyp: ${ev.type}`;
         eventsContainer.appendChild(evDiv);
     });
@@ -315,7 +384,18 @@ function drawEventsInMonthCell(td, cellDate, eventsArray) {
         dayEvents.slice(MAX_VISIBLE).forEach(ev => {
             const evDiv = document.createElement('div');
             evDiv.classList.add('event-item', ev.type);
-            evDiv.textContent = `${ev.title} (${ev.start})`;
+
+            const titleDiv = document.createElement("div");
+            titleDiv.classList.add("event-title");
+            titleDiv.textContent = ev.title;
+
+            const timeDiv = document.createElement("div");
+            timeDiv.classList.add("event-time");
+            timeDiv.textContent = ev.start;
+
+            evDiv.appendChild(titleDiv);
+            evDiv.appendChild(timeDiv);
+
             evDiv.title = `Tytuł: ${ev.title}\nGodziny: ${ev.start} - ${ev.end}\nTyp: ${ev.type}`;
             extraContainer.appendChild(evDiv);
         });
@@ -336,7 +416,7 @@ function drawEventsInMonthCell(td, cellDate, eventsArray) {
 }
 
 /***********************************************
- * RENDEROWANIE DNIA
+ * RENDEROWANIE DNIA (Z LANE)
  ***********************************************/
 function renderDay(filteredEvents = events) {
     const dayTbody = document.getElementById("day-schedule-body");
@@ -374,12 +454,24 @@ function renderDay(filteredEvents = events) {
     const d = String(currentDay.getDate()).padStart(2,'0');
     const dayStr = `${y}-${m}-${d}`;
 
-    filteredEvents
-        .filter(ev => ev.date === dayStr)
-        .forEach(ev => drawDayEvent(ev));
+    const dayEvents = filteredEvents.filter(ev => ev.date === dayStr);
+    // sortujemy
+    dayEvents.sort((a,b) => {
+        const [aH,aM] = a.start.split(":").map(Number);
+        const [bH,bM] = b.start.split(":").map(Number);
+        return (aH*60 + aM) - (bH*60 + bM);
+    });
+
+    // lane
+    const { assignments, laneCount } = assignEventLanes(dayEvents);
+
+    // rysujemy
+    assignments.forEach(({event, lane}) => {
+        drawDayEventWithLane(event, lane, laneCount);
+    });
 }
 
-function drawDayEvent(event) {
+function drawDayEventWithLane(event, lane, laneCount) {
     const [startHour, startMin] = event.start.split(":").map(Number);
     const [endHour, endMin] = event.end.split(":").map(Number);
 
@@ -393,16 +485,30 @@ function drawDayEvent(event) {
     const duration  = endTotal - startTotal;
     const blockHeight = (duration/60)*rowHeight;
 
+    // szerokość i przesunięcie
+    const laneWidth = 100 / laneCount;
+    const leftOffset = laneWidth * lane;
+
     const div = document.createElement("div");
     div.classList.add("event-block", event.type);
-    div.textContent = `${event.title} (${event.start} - ${event.end})`;
     div.title = `Tytuł: ${event.title}\nGodziny: ${event.start} - ${event.end}\nTyp: ${event.type}`;
 
     div.style.position = "absolute";
     div.style.top = offsetTop + "px";
     div.style.height = blockHeight + "px";
-    div.style.left = "2px";
-    div.style.right = "2px";
+    div.style.left = leftOffset + "%";
+    div.style.width = laneWidth + "%";
+
+    const titleDiv = document.createElement("div");
+    titleDiv.classList.add("event-title");
+    titleDiv.textContent = event.title;
+
+    const timeDiv = document.createElement("div");
+    timeDiv.classList.add("event-time");
+    timeDiv.textContent = `${event.start} - ${event.end}`;
+
+    div.appendChild(titleDiv);
+    div.appendChild(timeDiv);
 
     td.appendChild(div);
 }
@@ -419,8 +525,10 @@ function highlightTodayDay() {
 
     [...dayTbody.querySelectorAll('td')].forEach(td => td.classList.remove('todayHighlight'));
 
-    const today = new Date(); today.setHours(0,0,0,0);
-    const dayOnly = new Date(currentDay); dayOnly.setHours(0,0,0,0);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const dayOnly = new Date(currentDay);
+    dayOnly.setHours(0,0,0,0);
 
     if (dayOnly.getTime() === today.getTime()) {
         [...dayTbody.querySelectorAll('td')].forEach(td => td.classList.add('todayHighlight'));
@@ -428,7 +536,7 @@ function highlightTodayDay() {
 }
 
 /***********************************************
- * RENDEROWANIE SEMESTRU (ZIMOWY / LETNI)
+ * RENDEROWANIE SEMESTRU (Z LANE)
  ***********************************************/
 
 /**
@@ -436,13 +544,11 @@ function highlightTodayDay() {
  * miesiące należą do obecnego semestru 'winter' / 'summer'
  * w roku akademickim `currentSemesterYear`.
  *
- * Semestr zimowy: paź (9), lis (10), gru (11), sty (0) -> styczeń to year+1
- * Semestr letni: luty (1), mar (2), kwi (3), maj (4), cze (5) -> w year+1
+ * Semestr zimowy: paź (9), lis (10), gru (11), sty (0) -> styczeń -> year+1
+ * Semestr letni: luty..czerwiec w (year+1)
  */
 function getMonthsForCurrentSemester() {
     if (currentSemester === 'winter') {
-        // paź–lis–gru w "currentSemesterYear"
-        // styczeń w "currentSemesterYear + 1"
         return [
             { year: currentSemesterYear,   month: 9 },
             { year: currentSemesterYear,   month: 10 },
@@ -450,7 +556,7 @@ function getMonthsForCurrentSemester() {
             { year: currentSemesterYear+1, month: 0 },
         ];
     } else {
-        // 'summer': luty..czerwiec w (currentSemesterYear+1)
+        // 'summer'
         return [
             { year: currentSemesterYear+1, month: 1 },
             { year: currentSemesterYear+1, month: 2 },
@@ -461,16 +567,15 @@ function getMonthsForCurrentSemester() {
     }
 }
 
-/** Renderuje cały widok semestralny (kilka "mini-miesięcy"). */
+/** Renderuje cały widok semestralny (kilka "mini-miesięcy") */
 function renderSemester(filteredEvents = events) {
     const semesterContainer = document.getElementById('semester-container');
     if (!semesterContainer) return;
     semesterContainer.innerHTML = '';
 
-    // Pobieramy listę miesięcy dla bieżącego semestru
+    // Pobieramy listę miesięcy
     const months = getMonthsForCurrentSemester();
 
-    // Dla każdego miesiąca rysujemy "blok"
     months.forEach(({year, month}) => {
         const block = renderOneSemesterMonth(year, month, filteredEvents);
         semesterContainer.appendChild(block);
@@ -522,6 +627,9 @@ function renderOneSemesterMonth(year, month, eventsArray) {
         const tr = document.createElement('tr');
         for (let c = 0; c < 7; c++) {
             const td = document.createElement('td');
+            td.style.position = "relative";
+            td.style.height = "80px";  // np. 80px, aby zmieścić eventy
+            td.style.overflow = "hidden";
             const cellIndex = r*7 + c;
 
             if (cellIndex >= offset && dayCounter <= daysInMonth) {
@@ -534,8 +642,9 @@ function renderOneSemesterMonth(year, month, eventsArray) {
 
                 const cellDate = new Date(year, month, thisDay);
 
-                // Podświetlenie "dzisiaj" (opcjonalne)
-                const today = new Date(); today.setHours(0,0,0,0);
+                // Podświetlenie "dzisiaj"
+                const today = new Date();
+                today.setHours(0,0,0,0);
                 if (cellDate.toDateString() === today.toDateString()) {
                     td.classList.add('todayHighlight');
                 }
@@ -557,7 +666,10 @@ function renderOneSemesterMonth(year, month, eventsArray) {
     return block;
 }
 
-/** Wstawia wydarzenia do komórki w mini-miesiącu semestru. */
+/**
+ * Wstawia wydarzenia do komórki w semestrze z rozkładaniem obok siebie
+ * (podobnie jak w widoku tygodnia/dnia).
+ */
 function drawSemesterEventsInCell(td, cellDate, eventsArray) {
     const y = cellDate.getFullYear();
     const m = String(cellDate.getMonth()+1).padStart(2,'0');
@@ -567,78 +679,78 @@ function drawSemesterEventsInCell(td, cellDate, eventsArray) {
     const dayEvents = eventsArray.filter(ev => ev.date === cellDateStr);
     if (dayEvents.length === 0) return;
 
-    const container = document.createElement('div');
-    container.classList.add('semester-events-container');
-
-    const MAX_VISIBLE = 2;
-    dayEvents.slice(0, MAX_VISIBLE).forEach(ev => {
-        const evDiv = document.createElement('div');
-        evDiv.classList.add('semester-event-item', ev.type);
-        evDiv.textContent = `${ev.title} (${ev.start})`;
-        evDiv.title = `Tytuł: ${ev.title}\nGodziny: ${ev.start} - ${ev.end}\nTyp: ${ev.type}`;
-        container.appendChild(evDiv);
+    // sort
+    dayEvents.sort((a,b) => {
+        const [aH,aM] = a.start.split(":").map(Number);
+        const [bH,bM] = b.start.split(":").map(Number);
+        return (aH*60 + aM) - (bH*60 + bM);
     });
 
-    if (dayEvents.length > MAX_VISIBLE) {
-        const hiddenCount = dayEvents.length - MAX_VISIBLE;
-        const moreLink = document.createElement('div');
-        moreLink.classList.add('semester-more-link');
-        moreLink.textContent = `+${hiddenCount} więcej`;
-        container.appendChild(moreLink);
+    const { assignments, laneCount } = assignEventLanes(dayEvents);
 
-        const extraContainer = document.createElement('div');
-        extraContainer.classList.add('semester-extra-events');
-        extraContainer.style.display = 'none';
+    // rysujemy w 80px wysokości, 24h
+    const cellHeight = parseFloat(td.style.height) || 80;
+    const minutesInDay = 24*60;
+    const pxPerMin = cellHeight / minutesInDay;
 
-        dayEvents.slice(MAX_VISIBLE).forEach(ev => {
-            const evDiv = document.createElement('div');
-            evDiv.classList.add('semester-event-item', ev.type);
-            evDiv.textContent = `${ev.title} (${ev.start})`;
-            evDiv.title = `Tytuł: ${ev.title}\nGodziny: ${ev.start} - ${ev.end}\nTyp: ${ev.type}`;
-            extraContainer.appendChild(evDiv);
-        });
+    assignments.forEach(({event, lane}) => {
+        const [startH, startM] = event.start.split(":").map(Number);
+        const [endH, endM] = event.end.split(":").map(Number);
+        const startTotal = startH*60 + startM;
+        const endTotal   = endH*60 + endM;
+        const duration   = endTotal - startTotal;
 
-        container.appendChild(extraContainer);
-        moreLink.addEventListener('click', () => {
-            if (extraContainer.style.display === 'none') {
-                extraContainer.style.display = 'block';
-                moreLink.textContent = 'Ukryj';
-            } else {
-                extraContainer.style.display = 'none';
-                moreLink.textContent = `+${hiddenCount} więcej`;
-            }
-        });
-    }
+        const offsetTop = startTotal * pxPerMin;
+        const blockHeight = duration * pxPerMin;
 
-    td.appendChild(container);
+        const laneWidth = 100 / laneCount;
+        const leftOffset = laneWidth * lane;
+
+        const div = document.createElement('div');
+        div.classList.add('semester-event-item', event.type);
+        div.style.position = "absolute";
+        div.style.top = offsetTop + "px";
+        div.style.height = blockHeight + "px";
+        div.style.left = leftOffset + "%";
+        div.style.width = laneWidth + "%";
+        div.title = `Tytuł: ${event.title}\nGodziny: ${event.start} - ${event.end}\nTyp: ${event.type}`;
+
+        // Prosta zawartość
+        const titleDiv = document.createElement("div");
+        titleDiv.classList.add("event-title");
+        titleDiv.textContent = event.title;
+        titleDiv.style.fontSize = "10px";
+
+        const timeDiv = document.createElement("div");
+        timeDiv.classList.add("event-time");
+        timeDiv.textContent = event.start;
+        timeDiv.style.fontSize = "10px";
+
+        div.appendChild(titleDiv);
+        div.appendChild(timeDiv);
+
+        td.appendChild(div);
+    });
 }
 
 /**
  * shiftSemester(+1) => przejście do następnego semestru
  * shiftSemester(-1) => poprzedniego
- *
- * Logika:
- * - Z `winter` na `summer` – w tym samym `currentSemesterYear`
- * - Z `summer` na `winter` – zwiększamy `currentSemesterYear` o 1 (lub odejmujemy, jeśli cofamy).
  */
 function shiftSemester(direction) {
     if (currentSemester === 'winter') {
         if (direction === 1) {
-            // Z zimowego -> letni w tym samym roku akademickim
             currentSemester = 'summer';
         } else {
-            // Zimowy -> cofamy do letniego poprzedniego roku
             currentSemester = 'summer';
             currentSemesterYear -= 1;
         }
     } else {
         // 'summer'
         if (direction === 1) {
-            // Letni -> zimowy, ale year + 1
             currentSemester = 'winter';
             currentSemesterYear += 1;
         } else {
-            // Letni -> cofamy do zimowego (ten sam year)
             currentSemester = 'winter';
         }
     }
@@ -668,12 +780,57 @@ function applyFilters() {
     fetch(`/assets/scripts/FiltersLogic.php?${queryString}`)
         .then(response => response.json())
         .then(data => {
-            console.log('Returned data:', data); // Log the returned data
-            renderWeek(data);
+            console.log('Returned data:', data);
+
+            // Adaptacja danych z bazy do formatu eventów
+            const adaptedEvents = data.map(lesson => {
+                const startDate = new Date(lesson.lesson_start);
+                const endDate = new Date(lesson.lesson_end);
+
+                const year  = startDate.getFullYear();
+                const month = String(startDate.getMonth() + 1).padStart(2, '0');
+                const day   = String(startDate.getDate()).padStart(2, '0');
+
+                const startH = String(startDate.getHours()).padStart(2, '0');
+                const startM = String(startDate.getMinutes()).padStart(2, '0');
+                const endH   = String(endDate.getHours()).padStart(2, '0');
+                const endM   = String(endDate.getMinutes()).padStart(2, '0');
+
+                return {
+                    date:  `${year}-${month}-${day}`,
+                    start: `${startH}:${startM}`,
+                    end:   `${endH}:${endM}`,
+                    title: lesson.lesson_description,
+                    type:  lesson.lesson_form
+                };
+            });
+
+            // Nadpisanie globalnej zmiennej "events"
+            events = adaptedEvents;
+            renderAccordingToCurrentView();
         })
         .catch(error => {
             console.error('Error:', error);
         });
+}
+
+function renderAccordingToCurrentView() {
+    switch (currentView) {
+        case 'week':
+            renderWeek();
+            highlightToday();
+            break;
+        case 'month':
+            renderMonth();
+            break;
+        case 'day':
+            renderDay();
+            highlightTodayDay();
+            break;
+        case 'semester':
+            renderSemester();
+            break;
+    }
 }
 
 /** Walidacje: np. brak cyfr, tylko liczby, itd. */
@@ -777,7 +934,8 @@ function refreshFavouritesList() {
             document.getElementById('typStudiow').value = fav.typStudiow;
             document.getElementById('semestrStudiow').value = fav.semestrStudiow;
             document.getElementById('rokStudiow').value = fav.rokStudiow;
-            // Możesz automatycznie wywołać applyFilters(), jeśli chcesz
+            // Możesz od razu wywołać applyFilters(), jeśli chcesz:
+            // applyFilters();
         });
 
         listItem.appendChild(newButton);
@@ -958,7 +1116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (currentView === 'day') {
                 shiftDay(-1);
             } else if (currentView === 'semester') {
-                // cofnij się o jeden semestr
                 shiftSemester(-1);
             }
         });
@@ -990,12 +1147,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lista ulubionych
     refreshFavouritesList();
 
-    // Obsługa "Pokaż bieżący tydzień"
+    // "Pokaż bieżący tydzień / miesiąc / dzień / semestr"
     const showCurrentWeekBtn = document.getElementById('showCurrentWeekBtn');
     if (showCurrentWeekBtn) {
         showCurrentWeekBtn.addEventListener('click', () => {
             if (currentView === 'month') {
-                // Resetuj na aktualny miesiąc
                 currentMonth = new Date();
                 renderMonth();
             } else if (currentView === 'day') {
@@ -1003,8 +1159,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderDay();
                 highlightTodayDay();
             } else if (currentView === 'semester') {
-                // Ustal domyślnie year i semestr, np. sprawdzaj aktualną datę
-                // (tu na szybko: 2025, winter)
                 currentSemesterYear = 2025;
                 currentSemester = 'winter';
                 renderSemester();
@@ -1017,7 +1171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // "Pokaż tydzień" z datePicker
+    // "Pokaż tydzień" z datePicker (lub dzień, semestr, zależnie od widoku)
     const changeWeekBtn = document.getElementById('changeWeekBtn');
     if (changeWeekBtn) {
         changeWeekBtn.addEventListener('click', () => {
@@ -1036,9 +1190,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderDay();
                 highlightTodayDay();
             } else if (currentView === 'semester') {
-                // np. ustal semestr w zależności od daty
-                // (kod w zależności od Twojej logiki)
-                // Na razie zostawmy prosto:
                 currentSemesterYear = selectedDate.getFullYear();
                 currentSemester = 'winter';
                 renderSemester();
@@ -1050,7 +1201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Wczytanie filtrów z URL
+    // Wczytanie filtrów z URL (jeśli ktoś użyje linku z parametrami)
     const urlParams = new URLSearchParams(window.location.search);
     document.getElementById('wydzial').value = urlParams.get('wydzial') || '';
     document.getElementById('wykladowca').value = urlParams.get('wykladowca') || '';
