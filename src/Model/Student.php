@@ -21,12 +21,7 @@ class Student
 
     public function fill($array): Student
     {
-        foreach ($array as $key => $value) {
-            $method = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-            if (method_exists($this, $method)) {
-                $this->$method($value);
-            }
-        }
+        $this->setStudentId($array['student_id']);
 
         return $this;
     }
@@ -41,7 +36,7 @@ class Student
     public function save()
     {
         $pdo  = new \PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT INTO Student(student_id) VALUES (:student_id)');
+        $stmt = $pdo->prepare('INSERT OR IGNORE INTO Student(student_id) VALUES (:student_id)');
         $stmt->execute([
             'student_id' => $this->studentId
         ]);

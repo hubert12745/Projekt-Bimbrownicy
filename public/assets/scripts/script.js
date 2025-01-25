@@ -275,11 +275,12 @@ function applyFilters() {
         forma: document.getElementById('forma').value,
         typStudiow: document.getElementById('typStudiow').value,
         semestrStudiow: document.getElementById('semestrStudiow').value,
-        rokStudiow: document.getElementById('rokStudiow').value
+        rokStudiow: document.getElementById('rokStudiow').value,
+        nrAlbumu: document.getElementById('nrAlbumu').value
     };
 
     const queryString = new URLSearchParams(filters).toString();
-
+    console.log("Requesting: /assets/scripts/FiltersLogic.php?" + queryString);
     fetch(`/assets/scripts/FiltersLogic.php?${queryString}`)
         .then(response => response.json())
         .then(data => {
@@ -461,6 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const filterTypStudiow = document.getElementById('typStudiow').value;
             const filterSemestrStudiow = document.getElementById('semestrStudiow').value;
             const filterRokStudiow = document.getElementById('rokStudiow').value;
+            const filterNrAlbumu = document.getElementById('nrAlbumu').value;
         }
     });
 });
@@ -581,29 +583,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Opcjonalnie: automatycznie zastosuj filtry po załadowaniu
     applyFilters();
 });
-function applyFilters() {
-    const filters = {
-        wydzial: document.getElementById('wydzial').value,
-        wykladowca: document.getElementById('wykladowca').value,
-        sala: document.getElementById('sala').value,
-        przedmiot: document.getElementById('przedmiot').value,
-        grupa: document.getElementById('grupa').value,
-        forma: document.getElementById('forma').value,
-        typStudiow: document.getElementById('typStudiow').value,
-        semestrStudiow: document.getElementById('semestrStudiow').value,
-        rokStudiow: document.getElementById('rokStudiow').value
-    };
-
-    const queryString = new URLSearchParams(filters).toString();
-
-    fetch(`/assets/scripts/FiltersLogic.php?${queryString}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Returned data:', data); // Log the returned data
-            renderWeek(data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-}
-//DZIELENIE PLANEM

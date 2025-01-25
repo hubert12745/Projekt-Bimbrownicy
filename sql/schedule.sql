@@ -85,6 +85,7 @@ CREATE TABLE StudentGroup
 (
     student_id INTEGER ,
     group_id   INTEGER ,
+    PRIMARY KEY (student_id, group_id),
     FOREIGN KEY (student_id) REFERENCES Student (student_id),
     FOREIGN KEY (group_id) REFERENCES ClassGroup (group_id)
 );
