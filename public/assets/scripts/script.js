@@ -13,7 +13,8 @@ let currentDay = new Date();                            // do renderDay
 // ---------- SEMESTR ---------- //
 // Rok akademicki, np. 2025 -> semestr zimowy 2025/2026
 let currentSemesterYear = 2025;
-// 'winter' = paź-list-gru-sty, 'summer' = luty-mar-kwi-maj-cze
+// 'winter' = paź-list-gru-sty (od października bieżącego roku do stycznia roku+1)
+// 'summer' = luty-mar-kwi-maj-cze (tego samego roku, co w currentSemesterYear)
 let currentSemester = 'winter';
 
 // Główna tablica eventów — pusta na start (filtrowane z bazy)
@@ -26,7 +27,7 @@ let events = [];
 /** Zwraca Date poniedziałku tygodnia, w którym jest `date`. */
 function getMondayOfCurrentWeek(date) {
     const newDate = new Date(date);
-    const day = newDate.getDay(); // 0..6
+    const day = newDate.getDay(); // 0..6 (niedziela=0, poniedziałek=1, ...)
     const diff = (day === 0) ? -6 : (1 - day);
     newDate.setDate(newDate.getDate() + diff);
     newDate.setHours(0,0,0,0);
@@ -544,11 +545,14 @@ function highlightTodayDay() {
  * miesiące należą do obecnego semestru 'winter' / 'summer'
  * w roku akademickim `currentSemesterYear`.
  *
- * Semestr zimowy: paź (9), lis (10), gru (11), sty (0) -> styczeń -> year+1
- * Semestr letni: luty..czerwiec w (year+1)
+ *  - Zimowy: paź (9), lis (10), gru (11) danego roku + styczeń (0) kolejnego.
+ *  - Letni: luty(1)..czerwiec(5) TEGO SAMEGO roku,
+ *    żeby np. semestr letni 2025 pokazywał luty–czerwiec 2025.
  */
 function getMonthsForCurrentSemester() {
     if (currentSemester === 'winter') {
+        // paź, lis, gru => currentSemesterYear
+        // styczeń => currentSemesterYear + 1
         return [
             { year: currentSemesterYear,   month: 9 },
             { year: currentSemesterYear,   month: 10 },
@@ -556,13 +560,13 @@ function getMonthsForCurrentSemester() {
             { year: currentSemesterYear+1, month: 0 },
         ];
     } else {
-        // 'summer'
+        // 'summer': luty..czerwiec TEGO SAMEGO roku
         return [
-            { year: currentSemesterYear+1, month: 1 },
-            { year: currentSemesterYear+1, month: 2 },
-            { year: currentSemesterYear+1, month: 3 },
-            { year: currentSemesterYear+1, month: 4 },
-            { year: currentSemesterYear+1, month: 5 },
+            { year: currentSemesterYear, month: 1 },
+            { year: currentSemesterYear, month: 2 },
+            { year: currentSemesterYear, month: 3 },
+            { year: currentSemesterYear, month: 4 },
+            { year: currentSemesterYear, month: 5 },
         ];
     }
 }
@@ -740,17 +744,21 @@ function drawSemesterEventsInCell(td, cellDate, eventsArray) {
 function shiftSemester(direction) {
     if (currentSemester === 'winter') {
         if (direction === 1) {
+            // z zimowego 2025 do letniego 2025
             currentSemester = 'summer';
         } else {
+            // z zimowego 2025 do letniego 2024
             currentSemester = 'summer';
             currentSemesterYear -= 1;
         }
     } else {
         // 'summer'
         if (direction === 1) {
+            // z letniego 2025 do zimowego 2026
             currentSemester = 'winter';
             currentSemesterYear += 1;
         } else {
+            // z letniego 2025 do zimowego 2025
             currentSemester = 'winter';
         }
     }
@@ -911,7 +919,12 @@ function addFavourite() {
     alert("Filtry zapisane w ulubionych!");
 }
 
-/** Wczytanie ulubionych do listy przycisków */
+/**
+ * Wczytanie ulubionych do listy przycisków.
+ * Po kliknięciu:
+ *  - ustawiamy wartości w inputach
+ *  - natychmiast wywołujemy applyFilters()
+ */
 function refreshFavouritesList() {
     const favList = document.getElementById('buttonList');
     if (!favList) return;
@@ -934,8 +947,9 @@ function refreshFavouritesList() {
             document.getElementById('typStudiow').value = fav.typStudiow;
             document.getElementById('semestrStudiow').value = fav.semestrStudiow;
             document.getElementById('rokStudiow').value = fav.rokStudiow;
-            // Możesz od razu wywołać applyFilters(), jeśli chcesz:
-            // applyFilters();
+
+            // Po wybraniu ulubionych - od razu zastosuj filtry
+            applyFilters();
         });
 
         listItem.appendChild(newButton);
@@ -960,6 +974,34 @@ function shareSchedule() {
     const queryString = new URLSearchParams(filters).toString();
     const shareUrl = `${window.location.origin}${window.location.pathname}?${queryString}`;
     prompt("Skopiuj ten URL, aby podzielić się planem:", shareUrl);
+}
+
+/**
+ * Reset filtrów:
+ *  - Czyści wszystkie inputy
+ *  - Czyści tablicę events
+ *  - Przerysowuje kalendarz (pusty)
+ */
+function resetFilters() {
+    // Lista wszystkich pól do wyczyszczenia
+    const filterIds = [
+        'wydzial', 'wykladowca', 'sala', 'przedmiot',
+        'grupa', 'forma', 'typStudiow', 'semestrStudiow', 'rokStudiow'
+    ];
+
+    // Czyszczenie pól
+    filterIds.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.value = '';
+        }
+    });
+
+    // Wyczyszczenie globalnej listy wydarzeń
+    events = [];
+
+    // Przerysowanie kalendarza (bez wydarzeń)
+    renderAccordingToCurrentView();
 }
 
 /***********************************************
@@ -1008,6 +1050,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const applyFiltersBtn = document.querySelector('.filter-buttons button[type="button"]');
     if (applyFiltersBtn) {
         applyFiltersBtn.addEventListener('click', applyFilters);
+    }
+
+    // Przycisk "Reset filtrów"
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', resetFilters);
     }
 
     // Wyszukiwarki (dla sugestii)
@@ -1190,6 +1238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderDay();
                 highlightTodayDay();
             } else if (currentView === 'semester') {
+                // Przykładowo wymuszenie semestru zimowego i roku na podstawie daty:
                 currentSemesterYear = selectedDate.getFullYear();
                 currentSemester = 'winter';
                 renderSemester();

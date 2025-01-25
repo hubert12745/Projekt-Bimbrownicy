@@ -76,7 +76,7 @@ ob_start(); ?>
                 </div>
 
                 <div class="filter-buttons">
-                    <button type="reset">Resetuj filtry</button>
+                    <button type="reset" id="resetFiltersBtn">Resetuj filtry</button>
                     <button type="button" id="filterBtn">Zastosuj filtry</button>
 
                 </div>

@@ -277,7 +277,6 @@ main {
 ========================================= */
 .todayHighlight {
     background-color: rgba(255, 255, 0, 0.2);
-    /* Możesz dodać np. border: 2px solid #ff0; itp. */
 }
 
 /* =========================================
@@ -286,6 +285,7 @@ main {
 /* Główny bloczek eventu (absolute w komórce) */
 .event-block {
     position: absolute;
+    z-index: 100;
     left: 2px;
     right: 2px;
     padding: 3px 6px;
