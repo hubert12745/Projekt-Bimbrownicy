@@ -61,7 +61,7 @@ main {
 /* --- SIDEBAR --- */
 .sidebar {
     width: 20%;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     border-right: 1px solid #ddd;
     display: flex;
     flex-direction: column;
@@ -228,6 +228,7 @@ main {
     width: 100%;
     border-collapse: collapse;
     background-color: #fff;
+    overflow: visible;
 }
 
 /* Nagłówki (dni tygodnia + kolumna godzin) */
@@ -313,4 +314,234 @@ main {
 .todayHighlight {
     background-color: rgba(255, 255, 0, 0.2); /* Jasnożółte tło */
     /* Dodaj inne style według uznania, np. pogrubienie, obramowanie itd. */
+}
+
+/*
+              ----------WIDOK MIESIECZNY-------
+ */
+/* Podstawowy reset i styl tabeli miesięcznej */
+.month-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* wszystkie kolumny równej szerokości */
+}
+
+.month-table thead th {
+    background-color: #f9f9f9;
+    text-align: center;
+    font-weight: bold;
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+.month-table tbody td {
+    border: 1px solid #ddd;
+    vertical-align: top;
+    height: 100px;  /* minimalna wysokość "kratki" */
+    padding: 4px;
+    position: relative;
+    /* Możesz wymusić np. overflow:auto jeśli jest dużo eventów */
+}
+
+.month-table .day-number {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.month-table td.inactive {
+    background-color: #f7f7f7; /* szary dla pustych komórek przed 1. dniem i po */
+    color: #c8c7c7;
+}
+
+/* Kontener na eventy w danej komórce */
+.month-events-container {
+    margin-top: 3px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    /* ewentualnie overflow-y: auto; max-height: X px; */
+}
+
+/* Pojedynczy event */
+.month-table .event-item {
+    font-size: 12px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    color: #fff;
+    background-color: #3498db; /* domyślny kolor np. */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Kolory w zależności od typu zajęć */
+.event-item.lab       { background-color: #2ecc71; }
+.event-item.wyklad    { background-color: #3498db; }
+.event-item.lektorat  { background-color: #e67e22; }
+.event-item.projekt   { background-color: #16a085; }
+.event-item.audytoryjne { background-color: #8e44ad; }
+.event-item.egzamin   { background-color: #c0392b; }
+
+/* Styl linku "+x więcej" */
+.more-events-link {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #666;
+    font-size: 12px;
+    margin-top: 2px;
+    display: inline-block;
+}
+.more-events-link:hover {
+    color: #000;
+}
+/* widok miesieczny "więcej" */
+.more-events-link {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #666;
+    font-size: 12px;
+    margin-top: 2px;
+    display: inline-block;
+}
+
+.more-events-link:hover {
+    color: #000;
+}
+
+/* Kontener rozszerzonych zajęć – domyślnie schowany */
+.extra-events {
+    display: none;
+    margin-top: 4px;
+}
+
+.extra-events .event-item {
+    margin-bottom: 2px; /* aby ładnie się układały */
+}
+.event-item {
+    /* Ustawienia początkowe, np.: */
+    border-radius: 3px;
+    padding: 2px 6px;
+    margin: 1px 0;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Efekt przy najechaniu myszką */
+.event-item:hover {
+    background-color: rgba(255, 255, 0, 0.4); /* lekko żółte podświetlenie */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+/*
+        ----------WIDOK DZIENNY-------
+ */
+#dayView .day-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+}
+
+#dayView .day-table thead th {
+    background-color: #eee;
+    text-align: center;
+    padding: 8px;
+    border: 1px solid #ccc;
+    font-weight: bold;
+}
+
+#dayView .day-table tbody td {
+    border: 1px dotted #ccc;
+    vertical-align: top;
+    height: 60px;
+    position: relative; /* ułatwia absolute event-block */
+}
+
+/* Widok semestralny – kontener z wieloma miesiącami obok siebie */
+.semester-container {
+    display: flex;
+    gap: 40px;
+    /* Możesz dodać:
+    flex-wrap: wrap;
+    justify-content: center;
+    */
+}
+
+.semester-month-block {
+    width: 300px; /* np. większa szerokość */
+    border: 1px solid #ddd;
+    margin: 10px;
+    /* itp. */
+}
+
+.semester-month-header {
+    background-color: #eee;
+    font-size: 18px;  /* większa czcionka */
+    text-align: center;
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+}
+/* Tabela mini-miesiąca */
+.semester-month-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+.semester-month-table th {
+    background-color: #f9f9f9;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    font-size: 12px;
+    padding: 3px;
+}
+.semester-month-table td {
+    border: 1px solid #ddd;
+    vertical-align: top;
+    height: 80px;
+    position: relative;
+    padding: 2px;
+    font-size: 14px;
+}
+.semester-month-table .inactive {
+    background-color: #f2f2f2;
+    color: #aaa;
+}
+
+/* Eventy w semestrze */
+.semester-events-container {
+    margin-top: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.semester-event-item {
+    font-size: 10px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    color: #fff;
+    background-color: #3498db;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+/* Kolory w zależności od typu */
+.semester-event-item.lab       { background-color: #2ecc71; }
+.semester-event-item.wyklad    { background-color: #3498db; }
+.semester-event-item.lektorat  { background-color: #e67e22; }
+.semester-event-item.projekt   { background-color: #16a085; }
+.semester-event-item.audytoryjne { background-color: #8e44ad; }
+.semester-event-item.egzamin   { background-color: #c0392b; }
+
+/* Link "+X więcej" */
+.semester-more-link {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #666;
+    font-size: 10px;
+}
+.semester-more-link:hover {
+    color: #000;
+}
+.semester-extra-events {
+    display: none;
 }
