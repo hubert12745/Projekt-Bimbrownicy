@@ -909,6 +909,24 @@ function resetFilters() {
  ***********************************************/
 document.addEventListener('DOMContentLoaded', () => {
 
+    const toggleBtn = document.getElementById("toggle-btn");
+    const buttonGroup = document.querySelector(".button-group");
+
+    toggleBtn.addEventListener("click", function (event) {
+        if (buttonGroup.style.display === "none" || buttonGroup.style.display === "") {
+            buttonGroup.style.display = "flex";
+        } else {
+            buttonGroup.style.display = "none";
+        }
+        event.stopPropagation(); // Zapobiega zamknięciu od razu po kliknięciu
+    });
+
+    document.addEventListener("click", function (event) {
+        if (!buttonGroup.contains(event.target) && event.target !== toggleBtn) {
+            buttonGroup.style.display = "none";
+        }
+    });
+
     // Walidacje w czasie rzeczywistym
     const filtersToValidate = [
         { id: 'wydzial', validate: validateStringNoNumbers },

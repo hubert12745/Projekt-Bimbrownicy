@@ -49,21 +49,95 @@ main {
     position: relative;      /* aby .filters mogła być absolutnie w tym obszarze */
     padding: 10px;
 }
-
-/* Przykładowe przyciski w sidebarze */
-.button {
-    width: 90%;
-    padding: 15px;
-    margin: 10px 0;
-    background-color: #ddd;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
+.sidebar .button {
+    width: 100%;
+    margin-bottom: 10px;
     text-align: center;
 }
-.button:hover {
-    background-color: #bbb;
+/* Przykładowe przyciski w sidebarze */
+button {
+    padding: 10px 16px; /* Uniwersalny padding */
+    font-size: 14px; /* Spójny rozmiar tekstu */
+    font-weight: bold;
+    color: white;
+    background-color: #aeaeae; /* Domyślny niebieski */
+    border: none;
+    border-radius: 6px; /* Zaokrąglone rogi dla nowoczesnego wyglądu */
+    cursor: pointer;
+    transition: all 0.3s ease-in-out; /* Płynne animacje */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px; /* Minimalna szerokość dla spójności */
+    height: 40px; /* Ujednolicona wysokość */
+}
+
+/* === Efekt hover i aktywacji === */
+button:hover {
+    background-color: #9f9f9f; /* Ciemniejszy niebieski */
+    transform: scale(1.05); /* Delikatne powiększenie */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+    background-color: #2471a3; /* Jeszcze ciemniejszy kolor */
+    transform: scale(0.98); /* Delikatne "wciśnięcie" */
+}
+
+/* === Przycisk w wersji disabled (np. jeśli coś ładuje) === */
+button:disabled {
+    background-color: #bdc3c7;
+    color: #ecf0f1;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+/*=========================================
+    NAV BUTTONS
+=========================================*/
+.nav-button {
+    background-color: #34495e;
+}
+
+.nav-button:hover {
+    background-color: #2c3e50;
+}
+
+/* === Przyciski wyboru widoku === */
+.view-buttons button {
+    background-color: #16a085;
+}
+
+.view-buttons button:hover {
+    background-color: #1abc9c;
+}
+
+.fav-button {
+    background-color: rgba(195, 0, 0, 0.9);
+    width: 30px !important;
+    height: 30px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0; /* Zapobiega rozciąganiu */
+    min-width: unset; /* Usuwa globalne ustawienie */
+    max-width: unset; /* Zapewnia brak limitów */
+}
+.fav-button:hover {
+    background-color: rgba(158, 0, 0, 0.7);
+}
+/* === Przyciski w panelu filtrów === */
+#resetFiltersBtn {
+    background-color: #d54537;
+}
+#resetFiltersBtn:hover {
+    background-color: #c0392b;
+}
+#filterBtn {
+    background-color: #27ae60;
+}
+#filterBtn:hover {
+    background-color: #229954;
 }
 
 /* =========================================
@@ -164,15 +238,27 @@ main {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+#toggle-btn,
 #changeWeekBtn {
-    background-color: #3498db;
+    padding: 10px 15px; /* Dopasowanie rozmiaru */
+    font-size: 14px; /* Upewnienie się, że tekst jest tej samej wielkości */
+    background-color: #aeaeae; /* Ten sam kolor */
     color: white;
+    border: 1px solid #a5a4a4; /* Dopasowanie stylu obramowania */
+    border-radius: 5px;
     cursor: pointer;
-}
-#changeWeekBtn:hover {
-    background-color: #2980b9;
+    height: 40px; /* Upewnienie się, że mają taką samą wysokość */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+/* Efekt hover dla obu przycisków */
+#toggle-btn:hover,
+#changeWeekBtn:hover {
+    background-color: #9f9f9f; /* Przyciemnienie koloru */
+    border-color: #979696;
+}
 /* =========================================
    CZĘŚĆ GŁÓWNA KALENDARZA
 ========================================= */
@@ -343,6 +429,7 @@ main {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed; /* wszystkie kolumny równej szerokości */
+    background-color: white;
 }
 
 .month-table thead th {
@@ -462,6 +549,7 @@ main {
     width: 280px;  /* np. większa szerokość */
     border: 1px solid #ddd;
     margin: 10px;
+    background-color: white;
 }
 
 .semester-month-header {
@@ -549,4 +637,255 @@ main {
 }
 .semester-extra-events {
     display: none;
+}
+
+/* =========================================
+   WIDOK KALENDARZA PRZYCISKI
+
+ */
+.menu-container {
+    position: relative;
+    display: inline-block;
+    z-index: 1000; /* Ustawienie wyższego priorytetu nad innymi elementami */
+}
+
+#toggle-btn {
+    background-color: #aeaeae;
+    color: white;
+    border: none;
+    padding: 10px; /* Dopasowanie do "Pokaż tydzień" */
+    cursor: pointer;
+    /* Mniejsza czcionka */
+    border-radius: 5px;
+    width: auto; /* Dopasowanie szerokości do treści */
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+
+}
+
+.button-group {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: none; /* Ukrywanie na starcie */
+    flex-direction: column; /* Ustawienie pionowe */
+    align-items: stretch; /* Dostosowanie szerokości */
+    min-width: 100%; /* Gwarantowanie szerokości równej przyciskowi */
+    z-index: 2000;
+}
+
+.button-group.show {
+    display: flex;
+}
+
+.view-button {
+    text-align: center; /* Wyrównanie tekstu */
+    width: 100%; /* Pełna szerokość */
+}
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+/* Large tablets and small desktops */
+@media screen and (max-width: 1200px) {
+    .container {
+        width: 95%;
+        height: 95vh;
+    }
+
+    .sidebar {
+        width: 25%;
+    }
+
+    .main {
+        width: 75%;
+    }
+
+    .schedule-table tbody tr {
+        height: 50px; /* Slightly reduced cell height */
+    }
+
+    .event-block {
+        font-size: 11px;
+    }
+}
+
+/* Tablets */
+@media screen and (max-width: 992px) {
+    .container {
+        width: 100%;
+        height: 100vh;
+    }
+
+    /* Adjust navigation buttons */
+    .nav {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .view-buttons {
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    /* Adjust month view */
+    .month-table tbody td {
+        height: 80px;
+        padding: 2px;
+    }
+
+    .month-events-container {
+        max-height: 60px;
+        overflow-y: auto;
+    }
+}
+
+/* Small tablets and large phones */
+@media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+        padding: 10px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: white;
+    }
+
+    .main {
+        width: 100%;
+    }
+
+    /* Adjust filters panel */
+    .filters {
+        position: fixed;
+        height: 100vh;
+        width: 100vw;
+        top: 0;
+        left: 0;
+        z-index: 2000;
+    }
+
+    /* Adjust schedule table */
+    .schedule-table {
+        font-size: 12px;
+    }
+
+    .schedule-table thead th:first-child,
+    .schedule-table tbody td:first-child {
+        width: 40px;
+    }
+
+    /* Hide some columns in week view on mobile */
+    .schedule-table th:nth-child(6),
+    .schedule-table th:nth-child(7),
+    .schedule-table td:nth-child(6),
+    .schedule-table td:nth-child(7) {
+        display: none; /* Hide weekend days */
+    }
+}
+
+/* Phones */
+@media screen and (max-width: 576px) {
+    .nav {
+        justify-content: center;
+    }
+
+    button {
+        padding: 8px 12px;
+        font-size: 12px;
+        min-width: 100px;
+    }
+
+    /* Adjust week view */
+    .schedule-table thead th {
+        padding: 4px;
+        font-size: 11px;
+    }
+
+    .event-block {
+        font-size: 10px;
+        padding: 2px 4px;
+    }
+
+    /* Adjust month view */
+    .month-table .event-item {
+        font-size: 10px;
+    }
+
+    /* Adjust semester view */
+    .semester-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .semester-month-block {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    /* Adjust legend */
+    .legend {
+        flex-wrap: wrap;
+        gap: 5px;
+        font-size: 12px;
+    }
+
+    /* Make date picker and related controls more mobile-friendly */
+    #weekPicker,
+    #changeWeekBtn {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .menu-container {
+        width: 100%;
+    }
+
+    #toggle-btn {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .button-group {
+        width: 100%;
+    }
+}
+
+/* Very small phones */
+@media screen and (max-width: 375px) {
+    .event-block {
+        font-size: 9px;
+        padding: 1px 2px;
+    }
+
+    .schedule-table thead th {
+        font-size: 10px;
+    }
+
+    /* Further reduce button sizes */
+    button {
+        padding: 6px 10px;
+        font-size: 11px;
+        min-width: 80px;
+    }
+
+    /* Minimize padding in filter inputs */
+    .form-group input[type="text"] {
+        padding: 6px 8px;
+    }
 }

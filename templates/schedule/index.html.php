@@ -97,19 +97,24 @@ ob_start(); ?>
             <!-- Pasek nawigacji -->
             <div class="header">
                 <div class="nav">
-                    <button class="nav-button" id="prevWeekBtn">&lt; Poprzedni</button>
-                    <button class="nav-button" id="nextWeekBtn">Następny &gt;</button>
-                    <button class="nav-button" id="addEventBtn">Dodaj zajęcia</button>
-                    <button class="nav-button" id="addFavourtiesBtn">&lt;3</button>
-                    <button class="nav-button" id="showCurrentWeekBtn">Pokaż bieżący tydzień</button>
+                    <button class="button" id="prevWeekBtn">&lt; Poprzedni</button>
+                    <button class="button" id="nextWeekBtn">Następny &gt;</button>
+                    <button class="button" id="showCurrentWeekBtn">Dzisiaj</button>
+                    <button class="fav-button" id="addFavourtiesBtn">&lt;3</button>
+
                     <div class="view-buttons">
                         <input type="date" id="weekPicker">
                         <button id="changeWeekBtn">Pokaż tydzień</button>
-                        <button id="viewSemesterBtn" class="view-button">Semestr</button>
-                        <button id = "viewMonthBtn" class="view-button">Miesiąc</button>
-                        <button id ="viewWeekBtn" class="view-button">Tydzień</button>
-                        <button id= viewDayBtn class="view-button">Dzień</button>
-                        <div id="monthName" style="font-weight: bold; margin-left: 15px;"></div>
+                        <div class="menu-container">
+                        <button id="toggle-btn">Widok Kalendarza</button>
+                            <div class="button-group">
+                                <button id="viewSemesterBtn" class="view-button">Semestr</button>
+                                <button id = "viewMonthBtn" class="view-button">Miesiąc</button>
+                                <button id ="viewWeekBtn" class="view-button">Tydzień</button>
+                                <button id= viewDayBtn class="view-button">Dzień</button>
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
