@@ -27,6 +27,11 @@ switch ($action) {
         $controller = new \App\Controller\ScheduleController();
         $view = $controller->searchAction($templating, $router);
         break;
+
+    case 'api-schedule':
+        $controller = new \App\Controller\ApiController();
+        $view = $controller->scheduleAction($templating, $router);
+        break;
     default:
         $view = 'Not found';
         break;

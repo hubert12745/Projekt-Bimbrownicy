@@ -12,10 +12,10 @@ function scrape(string $faculty, string $start, string $end): void
 
 try {
     $startTime = microtime(true);
-//    $faculties =  ['WA','WBiHZ','WBiIS','WE','WEkon','WI','WIMiM','WKSiR','WNoZiR','WTMiT','WTiICH'];
-    $faculties =  ['WI'];
-    $start = '2025-01-20';
-    $end = '2025-01-31';
+    $faculties =  ['WA','WBiHZ','WBiIS','WE','WEkon','WI','WIMiM','WKSiR','WNoZiR','WTMiT','WTiICH'];
+//    $faculties =  ['WI'];
+    $start = '2024-10-1';
+    $end = '2025-02-15';
     foreach ($faculties as $faculty) {
         scrape($faculty, $start, $end);
     }

@@ -27,7 +27,7 @@ class Student
         $student = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if($student === false) {
-            $apiUrl =         $apiUrl = "https://plan.zut.edu.pl/schedule_student.php?number={$studentId}&start=2025-01-20&end=2025-01-27";
+            $apiUrl = "https://plan.zut.edu.pl/schedule_student.php?number={$studentId}&start=2025-01-20&end=2025-01-27";
             $apiResponse = file_get_contents($apiUrl);
             $studentData = json_decode($apiResponse, true);
             foreach ($studentData as $object) {
