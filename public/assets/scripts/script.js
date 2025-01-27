@@ -813,7 +813,8 @@ function addFavourite() {
         forma: getVal('forma'),
         typStudiow: getVal('typStudiow'),
         semestrStudiow: getVal('semestrStudiow'),
-        rokStudiow: getVal('rokStudiow')
+        rokStudiow: getVal('rokStudiow'),
+        nrAlbumu: getVal('nrAlbumu')
     };
 
     if (!newFavorite.name) return;
@@ -848,6 +849,7 @@ function refreshFavouritesList() {
             document.getElementById('typStudiow').value = fav.typStudiow;
             document.getElementById('semestrStudiow').value = fav.semestrStudiow;
             document.getElementById('rokStudiow').value = fav.rokStudiow;
+            document.getElementById('nrAlbumu').value = fav.nrAlbumu;
 
             // Po wybraniu ulubionych - od razu zastosuj filtry
             applyFilters();
@@ -899,7 +901,18 @@ function resetFilters() {
  * GŁÓWNY DOMContentLoaded
  ***********************************************/
 document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
 
+    hamburgerBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!sidebar.contains(event.target) && event.target !== hamburgerBtn) {
+            sidebar.classList.remove('active');
+        }
+    });
     const toggleBtn = document.getElementById("toggle-btn");
     const buttonGroup = document.querySelector(".button-group");
 

@@ -8,7 +8,8 @@ $bodyClass = 'index';
 ob_start(); ?>
     <div class="container">
         <!-- SIDEBAR -->
-        <div class="sidebar">
+        <button class="hamburger-button" id="hamburgerBtn">&#9776;</button>
+        <div class="sidebar" id="sidebar">
             <!-- Przycisk, który pokaże panel filtrów -->
             <button class="button" id="showFiltersBtn">Pokaż filtry</button>
 
@@ -87,7 +88,7 @@ ob_start(); ?>
 
                 </ul>
             </div>
-            <button onclick="shareSchedule()">Udostępnij plan</button>
+            <button onclick="shareSchedule()" id="shareBtn" class="button">Udostępnij plan</button>
 
         </div>
 
@@ -96,16 +97,17 @@ ob_start(); ?>
             <!-- Pasek nawigacji -->
             <div class="header">
                 <div class="nav">
-                    <button class="button" id="prevWeekBtn">&lt; Poprzedni</button>
-                    <button class="button" id="nextWeekBtn">Następny &gt;</button>
-                    <button class="button" id="showCurrentWeekBtn">Dzisiaj</button>
-                    <button class="fav-button" id="addFavourtiesBtn">&lt;3</button>
-
+                    <div class ="navigationBtn">
+                        <button class="button" id="prevWeekBtn">&lt; Poprzedni</button>
+                        <button class="button" id="showCurrentWeekBtn">Dzisiaj</button>
+                        <button class="button" id="nextWeekBtn">Następny &gt;</button>
+                    </div>
                     <div class="view-buttons">
+                        <button class="fav-button" id="addFavourtiesBtn">&lt;3</button>
                         <input type="date" id="weekPicker">
                         <button id="changeWeekBtn">Pokaż tydzień</button>
                         <div class="menu-container">
-                        <button id="toggle-btn">Widok Kalendarza</button>
+                        <button id="toggle-btn">Widoki</button>
                             <div class="button-group">
                                 <button id="viewSemesterBtn" class="view-button">Semestr</button>
                                 <button id = "viewMonthBtn" class="view-button">Miesiąc</button>
