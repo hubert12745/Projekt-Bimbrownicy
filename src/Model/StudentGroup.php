@@ -64,7 +64,7 @@ class StudentGroup
     public function save()
     {
         $pdo = new \PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT OR IGNORE INTO StudentGroup (student_id, group_id) VALUES (:student_id, :group_id)');
+        $stmt = $pdo->prepare('INSERT OR REPLACE INTO StudentGroup (student_id, group_id) VALUES (:student_id, :group_id)');
         $stmt->execute([
             'student_id' => $this->studentId,
             'group_id' => $this->groupId

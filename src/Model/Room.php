@@ -95,7 +95,7 @@ class Room
         );
 
         $stmt = $pdo->prepare(
-            'INSERT OR IGNORE INTO Room (room_name, faculty_id)
+            'INSERT OR REPLACE INTO Room (room_name, faculty_id)
              VALUES (:room_name, :faculty_id)'
         );
 

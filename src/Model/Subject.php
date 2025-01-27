@@ -104,7 +104,7 @@ class Subject
         );
 
         $stmt = $pdo->prepare(
-            'INSERT OR IGNORE INTO Subject (subject_name, subject_type, faculty_id)
+            'INSERT OR REPLACE INTO Subject (subject_name, subject_type, faculty_id)
              VALUES (:subject_name, :subject_type, :faculty_id)'
         );
 

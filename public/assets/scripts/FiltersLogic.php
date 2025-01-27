@@ -7,35 +7,6 @@ use App\Model\StudentGroup;
 use App\Service\Config;
 
 
-function checkAndInsertStudent($pdo, $studentId)
-{
-    // Check if student_id exists in the database
-    $checkQuery = "SELECT student_id FROM Student WHERE student_id = :student_id";
-    $checkStmt = $pdo->prepare($checkQuery);
-    $checkStmt->execute([':student_id' => $studentId]);
-    $studentExists = $checkStmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$studentExists) {
-        // Scrape data from API
-        $apiUrl = "https://plan.zut.edu.pl/schedule_student.php?number={$studentId}&start=2025-01-20&end=2025-01-27";
-        $apiResponse = file_get_contents($apiUrl);
-        $studentData = json_decode($apiResponse, true);
-//        error_log("API response: " . json_encode($studentData));
-        foreach ($studentData as $object) {
-            $object['student_id'] = $studentId;
-            $student = Student::fromApi($object);
-            $student->save();
-            if(isset($object['group_name'])){
-                $studentGroup = StudentGroup::fromApi($object);
-                $studentGroup->save();
-            }
-        }
-
-    }else{
-        error_log("Student with ID: $studentId already exists in the database");
-    }
-}
-
 try {
     $pdo = new PDO(
         Config::get('db_dsn'),
@@ -59,7 +30,7 @@ try {
 
     if ($filters['nrAlbumu']) {
         error_log("checkAndInsertStudent called with student ID: " . $filters['nrAlbumu']);
-        checkAndInsertStudent($pdo, $filters['nrAlbumu']);
+        Student::checkAndInsertStudent($filters['nrAlbumu']);
     }
 
     $query = "SELECT * FROM Lesson WHERE 1=1";
