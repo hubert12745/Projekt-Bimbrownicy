@@ -4,7 +4,6 @@ namespace App\Model;
 use PDO;
 use App\Service\Config;
 use PDOException;
-use App\Model\Student;
 
 class FiltersLogic
 {
