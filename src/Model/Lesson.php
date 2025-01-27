@@ -222,7 +222,7 @@ class Lesson
         );
 
         $stmt = $pdo->prepare(
-            "INSERT OR REPLACE INTO Lesson (
+            "INSERT OR IGNORE INTO Lesson (
                 subject_id, 
                 worker_id, 
                 group_id, 

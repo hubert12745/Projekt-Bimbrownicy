@@ -11,13 +11,9 @@ let currentMonth = new Date();                          // do renderMonth
 let currentDay = new Date();                            // do renderDay
 
 // ---------- SEMESTR ---------- //
-// Rok akademicki, np. 2025
 let currentSemesterYear = 2025;
-// 'winter' = paź (9)..gru(11), sty(0) TEGO SAMEGO roku (lub +1 - zależnie od Twoich potrzeb)
-// 'summer' = luty(1)..czerwiec(5)
 let currentSemester = 'winter';
 
-// Główna tablica eventów — pusta na start (filtrowane z bazy)
 let events = [];
 
 /***********************************************
@@ -27,7 +23,7 @@ let events = [];
 /** Zwraca Date poniedziałku tygodnia, w którym jest `date`. */
 function getMondayOfCurrentWeek(date) {
     const newDate = new Date(date);
-    const day = newDate.getDay(); // 0..6 (niedziela=0, poniedziałek=1, ...)
+    const day = newDate.getDay();
 
     // Poniedziałek: diff= (1 - 1)=0  / Niedziela: diff= (1 - 0)=1?
     // Lepiej uwzględnić, że Sunday=0 => chcemy -6, by cofnąć do poniedziałku
@@ -66,10 +62,6 @@ function assignEventLanes(dayEvents) {
     const lanes = [];
     const assignments = [];
 
-    // Zakładamy, że dayEvents jest już wstępnie posortowane
-    // lub sortujemy wewnątrz:
-    // dayEvents.sort((a, b) => ...
-    // Ale zwykle już sortujemy w renderowaniu.
 
     for (let ev of dayEvents) {
         const [startH, startM] = ev.start.split(":").map(Number);
@@ -136,7 +128,6 @@ function buildScheduleBody() {
 }
 
 function highlightToday() {
-    // Usuwamy stare podświetlenia
     for (let i = 0; i < 7; i++) {
         const dayHeader = document.getElementById(`day-${i}`);
         if (dayHeader) dayHeader.classList.remove('todayHighlight');
@@ -700,8 +691,8 @@ function applyFilters() {
     };
 
     const queryString = new URLSearchParams(filters).toString();
-    console.log("Requesting: /assets/scripts/FiltersLogic.php?" + queryString);
-    fetch(`/assets/scripts/FiltersLogic.php?${queryString}`)
+    console.log("Requesting: /index.php?action=schedule-filter&" + queryString);
+    fetch(`/index.php?action=schedule-filter&${queryString}`)
         .then(response => response.json())
         .then(data => {
             console.log('Returned data:', data);
@@ -977,24 +968,28 @@ document.addEventListener('DOMContentLoaded', () => {
         resetFiltersBtn.addEventListener('click', resetFilters);
     }
 
-    // Inputy z sugestiami
     const filterIds = [
         'wydzial','wykladowca','sala','przedmiot','grupa',
         'forma','typStudiow','semestrStudiow','rokStudiow'
     ];
+
+    // Inputy z sugestiami
     filterIds.forEach(filterId => {
         const input = document.getElementById(filterId);
         if (!input) return;
+
         const suggestionsBox = document.createElement('div');
         suggestionsBox.classList.add('suggestions-box');
         input.parentNode.appendChild(suggestionsBox);
 
         input.addEventListener('input', function() {
-            const query = this.value;
+            const query = this.value.trim();
             if (query.length > 2) {
-                fetch(`/assets/scripts/SearchPredictions.php?query=${encodeURIComponent(query)}&filter=${encodeURIComponent(filterId)}`)
-                    .then(resp => resp.text())
-                    .then(text => JSON.parse(text))
+                fetch(`/index.php?action=search-predictions&query=${encodeURIComponent(query)}&filter=${encodeURIComponent(filterId)}`)
+                    .then(resp => {
+                        if (!resp.ok) throw new Error(`Błąd: ${resp.status} ${resp.statusText}`);
+                        return resp.json();
+                    })
                     .then(data => {
                         suggestionsBox.innerHTML = '';
                         data.forEach(item => {

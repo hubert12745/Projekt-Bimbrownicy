@@ -140,7 +140,7 @@ class Worker
         );
 
         $stmt = $pdo->prepare(
-            'INSERT OR REPLACE INTO Worker 
+            'INSERT OR IGNORE INTO Worker 
             (title, first_name, last_name, full_name, login, faculty_id)
             VALUES
             (:title, :first_name, :last_name, :full_name, :login, :faculty_id)'

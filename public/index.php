@@ -15,33 +15,17 @@ switch ($action) {
         $controller = new \App\Controller\ScheduleController();
         $view = $controller->indexAction($templating, $router);
         break;
-    case 'schedule-show':
-        if (isset($_REQUEST['id'])) {
-            $controller = new \App\Controller\ScheduleController();
-            $view = $controller->showAction((int)$_REQUEST['id'], $templating, $router);
-        } else {
-            throw new NotFoundException("Missing schedule ID");
-        }
-        break;
-    case 'schedule-create':
-        $controller = new \App\Controller\ScheduleController();
-        $view = $controller->createAction($_REQUEST['schedule'] ?? null, $templating, $router);
-        break;
-    case 'schedule-edit':
-        if (isset($_REQUEST['id'])) {
-            $controller = new \App\Controller\ScheduleController();
-            $view = $controller->editAction((int)$_REQUEST['id'], $_REQUEST['schedule'] ?? null, $templating, $router);
-        }
-        break;
-    case 'schedule-delete':
-        if (isset($_REQUEST['id'])) {
-            $controller = new \App\Controller\ScheduleController();
-            $view = $controller->deleteAction((int)$_REQUEST['id'], $router);
-        }
-        break;
     case 'info':
         $controller = new \App\Controller\InfoController();
         $view = $controller->infoAction();
+        break;
+    case 'schedule-filter':
+        $controller = new \App\Controller\ScheduleController();
+        $view = $controller->filterAction($templating, $router);
+        break;
+    case 'search-predictions':
+        $controller = new \App\Controller\ScheduleController();
+        $view = $controller->searchAction($templating, $router);
         break;
     default:
         $view = 'Not found';

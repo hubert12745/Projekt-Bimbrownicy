@@ -1,6 +1,5 @@
 <?php
 
-/** @var \App\Model\Schedule[] $schedules */
 /** @var \App\Service\Router $router */
 
 $title = 'Schedule List';

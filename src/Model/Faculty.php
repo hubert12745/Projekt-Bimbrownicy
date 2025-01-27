@@ -59,7 +59,7 @@ class Faculty
     public function save()
     {
         $pdo = new \PDO(Config::get('db_dsn'), Config::get('db_user'), Config::get('db_pass'));
-        $stmt = $pdo->prepare('INSERT OR REPLACE INTO Faculty ( faculty_name, faculty_short) VALUES (:faculty_name, :faculty_short)');
+        $stmt = $pdo->prepare('INSERT OR IGNORE INTO Faculty ( faculty_name, faculty_short) VALUES (:faculty_name, :faculty_short)');
         $stmt->execute([
             'faculty_name' => $this->facultyName,
             'faculty_short' => $this->facultyShort

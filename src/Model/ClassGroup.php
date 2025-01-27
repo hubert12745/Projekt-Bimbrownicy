@@ -168,7 +168,7 @@ class ClassGroup
         );
 
         $stmt = $pdo->prepare(
-            'INSERT OR REPLACE INTO ClassGroup 
+            'INSERT OR IGNORE INTO ClassGroup 
                (group_name,year, semester, faculty_id, department, field_of_study, type_of_study) 
              VALUES 
                (:group_name,:year, :semester, :faculty_id, :department, :field_of_study, :type_of_study)'
