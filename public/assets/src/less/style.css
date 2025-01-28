@@ -16,7 +16,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh; /* Wypełnia całe okno przeglądarki */
-    background-color: #f4f4f4;
+    background-color: #C7D1CC;
 }
 
 main {
@@ -31,8 +31,7 @@ main {
     display: flex;
     width: 90%;
     height: 90vh;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    background-color: #5D6F66;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -40,9 +39,9 @@ main {
    SIDEBAR
 ========================================= */
 .sidebar {
+    margin-top: 10px;
     width: 20%;
-    background-color: #ffffff;
-    border-right: 1px solid #ddd;
+    background-color: #5D6F66;
     display: flex;
     flex-direction: column;
     align-items: flex-start; /* wyrównanie przycisków do lewej */
@@ -60,7 +59,7 @@ button {
     font-size: 14px; /* Spójny rozmiar tekstu */
     font-weight: bold;
     color: white;
-    background-color: #aeaeae; /* Domyślny niebieski */
+    background-color: #333333; /* Domyślny niebieski */
     border: none;
     border-radius: 6px; /* Zaokrąglone rogi dla nowoczesnego wyglądu */
     cursor: pointer;
@@ -68,19 +67,19 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 120px; /* Minimalna szerokość dla spójności */
     height: 40px; /* Ujednolicona wysokość */
+    min-width: 50px;
 }
 
 /* === Efekt hover i aktywacji === */
 button:hover {
-    background-color: #9f9f9f; /* Ciemniejszy niebieski */
+    background-color: #5C5C5C; /* Ciemniejszy niebieski */
     transform: scale(1.05); /* Delikatne powiększenie */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
 }
 
 button:active {
-    background-color: #2471a3; /* Jeszcze ciemniejszy kolor */
+    background-color: #9FCAD1; /* Jeszcze ciemniejszy kolor */
     transform: scale(0.98); /* Delikatne "wciśnięcie" */
 }
 
@@ -96,20 +95,20 @@ button:disabled {
     NAV BUTTONS
 =========================================*/
 .nav-button {
-    background-color: #34495e;
+    background-color: #5C5C5C;
 }
 
 .nav-button:hover {
-    background-color: #2c3e50;
+    background-color: #5C5C5C;
 }
 
 /* === Przyciski wyboru widoku === */
 .view-button button {
-    background-color: #16a085;
+    background-color: #5C5C5C;
 }
 
 .view-button button:hover {
-    background-color: #1abc9c;
+    background-color: #5C5C5C;
 }
 
 .fav-button {
@@ -160,7 +159,7 @@ button:disabled {
     left: 0;
     width: 100%;
     height: 100%;  /* wypełnia całą wysokość sidebaru */
-    background-color: #fff;
+    background-color: #5D6F66;
     z-index: 999;  /* nakrywa normalny sidebar */
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 
@@ -175,7 +174,7 @@ button:disabled {
 
 /* Przycisk wewnątrz panelu filtrów do zamykania */
 .close-button {
-    background-color: #ddd;
+    background-color: #5C5C5C;
     border: none;
     border-radius: 5px;
     padding: 10px;
@@ -184,7 +183,7 @@ button:disabled {
     margin-bottom: 20px;
 }
 .close-button:hover {
-    background-color: #bbb;
+    background-color: #333333;
 }
 
 /* Pojedyncze "pola" filtrów */
@@ -232,20 +231,25 @@ button:disabled {
 /* =========================================
    ELEMENTY OBSŁUGI GÓRNEJ (WEEKPICKER, PRZYCISKI)
 ========================================= */
+#weekPicker{
+    background-color: #333333;
+    color: white;
+}
+
 #weekPicker,#toggle-btn,
 #changeWeekBtn {
     padding: 10px;
     margin: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #5c6e65;
     border-radius: 5px;
 }
 #toggle-btn,
 #changeWeekBtn {
     padding: 10px 15px; /* Dopasowanie rozmiaru */
     font-size: 14px; /* Upewnienie się, że tekst jest tej samej wielkości */
-    background-color: #aeaeae; /* Ten sam kolor */
+    background-color: #333333; /* Ten sam kolor */
     color: white;
-    border: 1px solid #a5a4a4; /* Dopasowanie stylu obramowania */
+    border: 1px solid #333333; /* Dopasowanie stylu obramowania */
     border-radius: 5px;
     cursor: pointer;
     height: 40px; /* Upewnienie się, że mają taką samą wysokość */
@@ -257,8 +261,8 @@ button:disabled {
 /* Efekt hover dla obu przycisków */
 #toggle-btn:hover,
 #changeWeekBtn:hover {
-    background-color: #9f9f9f; /* Przyciemnienie koloru */
-    border-color: #979696;
+    background-color: #5C5C5C; /* Ciemniejszy niebieski */
+    border-color: #333333;
 }
 /* =========================================
    CZĘŚĆ GŁÓWNA KALENDARZA
@@ -273,7 +277,7 @@ button:disabled {
 /* Pasek nawigacji (góra) */
 .header {
     padding: 10px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #5D6F66;
 }
 .nav {
     display: flex;
@@ -303,13 +307,13 @@ button:disabled {
 }
 .view-button {
     padding: 8px 15px;
-    background-color: #27ae60;
+    background-color: #333333;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 .view-button:hover {
-    background-color: #229954;
+    background-color: #5C5C5C;
 }
 
 /* Kontener na tabelę (plan) */
@@ -317,10 +321,15 @@ button:disabled {
     flex: 1;               /* wypełnia resztę pionowo */
     display: flex;
     flex-direction: column;
-    background-color: #e0e0e0;
+    background-color: #333333;
     overflow: auto;        /* scroll, gdy treść wysoka */
     padding: 10px;
 }
+
+.semester-month-block h3 {
+    background-color: #a4b3ab;
+}
+
 
 /* =========================================
    TABELA TYGODNIOWA (Week View)
@@ -329,12 +338,12 @@ button:disabled {
     flex: 1;              /* pozwala rozciągać w pionie */
     width: 100%;
     border-collapse: collapse;
-    background-color: #fff;
+    background-color: #D2DAD6;
     overflow: visible;
 }
 
 .schedule-table thead th {
-    background-color: #eee;
+    background-color: #A6B5AD;
     text-align: center;
     padding: 8px;
     border: 1px solid #ccc;
@@ -344,7 +353,7 @@ button:disabled {
 /* Pierwsza kolumna: godzina */
 .schedule-table thead th:first-child,
 .schedule-table tbody td:first-child {
-    border-right: 2px solid #ccc;
+    border-right: 2px solid #A6B5AD;
     text-align: center;
     width: 50px;
 }
@@ -356,7 +365,7 @@ button:disabled {
 
 /* Komórki w tabeli (poszczególne dni) */
 .schedule-table tbody td {
-    border: 1px dotted #ccc;
+    border: 1px dotted #A6B5AD;
     position: relative; /* aby .event-block można było absolute w środku */
     vertical-align: top;
 }
@@ -365,7 +374,7 @@ button:disabled {
    PODŚWIETLENIE "DZISIAJ"
 ========================================= */
 .todayHighlight {
-    background-color: rgba(255, 255, 0, 0.2);
+    background-color: #B0BFB8;
 }
 
 /* =========================================
@@ -391,21 +400,22 @@ button:disabled {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-.event-block.laboratorium { background-color: #2ecc71; }
-.event-block.wykład       { background-color: #3498db; }
-.event-block.lektorat     { background-color: #e67e22; }
-.event-block.projekt      { background-color: #16a085; }
-.event-block.audytoryjne  { background-color: #8e44ad; }
-.event-block.egzamin      { background-color: #2980b9; }
+.event-block.laboratorium { background-color: #7209b7; }
+.event-block.wykład       { background-color: #3DA5D9; }
+.event-block.lektorat     { background-color: #EA7317; }
+.event-block.projekt      { background-color: #73BFB8; }
+.event-block.audytoryjne  { background-color: #FEC601; }
+.event-block.egzamin      { background-color: #2364AA; }
 
 /* =========================================
    LEGEND
 ========================================= */
 .legend {
     padding: 10px;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #5D6F66;
     font-size: 14px;
-    background-color: #fafafa;
+    background-color: #5D6F66;
+    color: #333333;
 }
 
 .dot {
@@ -418,12 +428,12 @@ button:disabled {
 }
 
 /* Dodajemy klasy kolorów takie same, jak dla eventów */
-.dot.laboratorium { background-color: #2ecc71; }
-.dot.wyklad       { background-color: #3498db; }
-.dot.lektorat     { background-color: #e67e22; }
-.dot.projekt      { background-color: #16a085; }
-.dot.audytoryjne  { background-color: #8e44ad; }
-.dot.egzamin      { background-color: #2980b9; }
+.dot.laboratorium { background-color: #7109b6; }
+.dot.wyklad       { background-color: #3da4d7; }
+.dot.lektorat     { background-color: #e87217; }
+.dot.projekt      { background-color: #72beb7; }
+.dot.audytoryjne  { background-color: #fcc401; }
+.dot.egzamin      { background-color: #2363a9; }
 
 /* =========================================
    WIDOK MIESIĘCZNY (Month View)
@@ -432,19 +442,19 @@ button:disabled {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed; /* wszystkie kolumny równej szerokości */
-    background-color: white;
+    background-color: #d0d8d4;
 }
 
 .month-table thead th {
-    background-color: #f9f9f9;
+    background-color: #a5b4ac;
     text-align: center;
     font-weight: bold;
     padding: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid #a5b4ac;
 }
 
 .month-table tbody td {
-    border: 1px solid #ddd;
+    border: 1px solid #a5b4ac;
     vertical-align: top;
     height: 100px;  /* minimalna wysokość "kratki" */
     padding: 4px;
@@ -457,7 +467,7 @@ button:disabled {
 }
 
 .month-table td.inactive {
-    background-color: #f7f7f7; /* szary dla pustych komórek */
+    background-color: rgba(96, 110, 101, 0.48); /* szary dla pustych komórek */
     color: #c8c7c7;
 }
 
@@ -488,12 +498,12 @@ button:disabled {
 }
 
 /* Kolory w zależności od typu zajęć (dla widoku MIESIĘCZNEGO) */
-.event-item.laboratorium  { background-color: #2ecc71; }
-.event-item.wykład        { background-color: #3498db; }
-.event-item.lektorat      { background-color: #e67e22; }
-.event-item.projekt       { background-color: #16a085; }
-.event-item.audytoryjne   { background-color: #8e44ad; }
-.event-item.egzamin       { background-color: #c0392b; }
+.event-item.laboratorium  { background-color: #7109b6; }
+.event-item.wykład        { background-color: #3da4d7; }
+.event-item.lektorat      { background-color: #e87217; }
+.event-item.projekt       { background-color: #72beb7; }
+.event-item.audytoryjne   { background-color: #fcc401; }
+.event-item.egzamin       { background-color: #2363a9; }
 
 /* Link "+x więcej" i kontener ukrytych eventów */
 .more-events-link {
@@ -521,19 +531,19 @@ button:disabled {
 #dayView .day-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #fff;
+    background-color: #d0d8d4;
 }
 
 #dayView .day-table thead th {
-    background-color: #eee;
+    background-color: #b2beb7;
     text-align: center;
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #a5b4ac;
     font-weight: bold;
 }
 
 #dayView .day-table tbody td {
-    border: 1px dotted #ccc;
+    border: 1px dotted #a5b4ac;
     vertical-align: top;
     height: 60px;
     position: relative; /* ułatwia absolute event-block */
@@ -556,7 +566,7 @@ button:disabled {
 }
 
 .semester-month-header {
-    background-color: #eee;
+    background-color: #a4b3ab;
     font-size: 18px;  /* większa czcionka */
     text-align: center;
     padding: 8px;
@@ -570,7 +580,7 @@ button:disabled {
 }
 
 .semester-month-table th {
-    background-color: #f9f9f9;
+    background-color: #a4b3ab;
     text-align: center;
     font-weight: bold;
     border: 1px solid #ddd;
@@ -619,12 +629,12 @@ button:disabled {
 }
 
 /* Kolory w zależności od typu (widok SEMESTRALNY) */
-.semester-event-item.laboratorium { background-color: #2ecc71; }
-.semester-event-item.wykład       { background-color: #3498db; }
-.semester-event-item.lektorat     { background-color: #e67e22; }
-.semester-event-item.projekt      { background-color: #16a085; }
-.semester-event-item.audytoryjne  { background-color: #8e44ad; }
-.semester-event-item.egzamin      { background-color: #c0392b; }
+.semester-event-item.laboratorium { background-color: #7109b6; }
+.semester-event-item.wykład       { background-color: #3da4d7; }
+.semester-event-item.lektorat     { background-color: #e87217; }
+.semester-event-item.projekt      { background-color: #73BFB8; }
+.semester-event-item.audytoryjne  { background-color: #fcc401; }
+.semester-event-item.egzamin      { background-color: #2363a9; }
 
 /* Link "+X więcej" w semestrze */
 .semester-more-link {
@@ -656,7 +666,7 @@ button:disabled {
     position: absolute;
     top: 100%;
     left: 0;
-    background: white;
+    background: #333333;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     overflow: hidden;
     display: none; /* Ukrywanie na starcie */
@@ -685,7 +695,7 @@ button:disabled {
 #prevWeekBtn, #nextWeekBtn, #showCurrentWeekBtn{
     padding: 10px;
     margin: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #333333;
     border-radius: 5px;
     cursor: pointer;
 }
@@ -699,12 +709,43 @@ button:disabled {
     justify-content: center;
 }
 
+#sala, #wydzial, #nrAlbumu, #grupa, #wykladowca, #przedmiot, #forma, #semestrStudiow, #rokStudiow, #typStudiow {
+    background-color: #5C5C5C;
+    color: white;
+    border-color: #5C5C5C;
+    border-bottom-color: #333333;
+}
+
+#sala:hover, #wydzial:hover, #nrAlbumu:hover, #grupa:hover, #wykladowca:hover, #przedmiot:hover, #forma:hover, #semestrStudiow:hover, #rokStudiow:hover, #typStudiow:hover {
+    background-color: #333333;
+}
+
+#sala:active, #wydzial:active, #nrAlbumu:active, #grupa:active, #wykladowca:active, #przedmiot:active, #forma:active, #semestrStudiow:active, #rokStudiow:active, #typStudiow:active {
+    background-color: #5C5C5C;
+}
+
+.form-group label {
+    color: white;
+}
+
+input::placeholder {
+    color: #A3A3A3;
+}
+
 
 /* =========================================
    RESPONSIVE DESIGN
 ========================================= */
 /* Responsive styles */
-@media (max-width: 768px) {
+@media (max-width: 500px) {
+    .body
+    {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+    }
     .sidebar {
         display: none;
         position: fixed;
@@ -738,19 +779,21 @@ button:disabled {
         border: none;
         font-size: 24px;
         cursor: pointer;
+        margin-bottom:2px;
+        width: 40px;
     }
 
     .schedule-container {
         width: 100%;
-        height: 100%;
+        height: 90%;
+        margin: 0px;
+        padding: 0px;
     }
     .main {
         width: 100%;
     }
     .container {
         margin: 0px;
-        height: 100%;
-        width: 100%;
     }
     body {
         height: 100%;
@@ -803,13 +846,88 @@ button:disabled {
         height: 40px; /* Increase the height */ !important;
         margin: 0 auto; /* Center the button */
         background-color: darkred; !important;
+        min-width: 40px;
+        max-width: 100px;
+        margin-top: 10px;
     }
 
 
     .navigationBtn {
-        width: 100%;
         display: flex;
-        justify-content: center; /* Center the buttons */
+        justify-content: center;
         gap: 10px;
+        position: fixed;
+        bottom:5px;
+        margin-bottom: 50px;
+        z-index: 100;
+        width: 80%;
     }
+
+    .legend {
+        position: fixed;
+        bottom: 10px;
+        width: 80%;
+        right: 10px;
+        margin: 0px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .view-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .nav {
+        flex-direction: column-reverse;
+    }
+
+    .hamburger-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        bottom: 10px; /* Position at the bottom */
+        right: 10px;   /* Adjust left position as needed */
+        z-index: 1100;
+        background: #333;
+        color: white;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        margin-bottom:2px;
+    }
+
+    .sidebar {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background-color: #606e65;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+        z-index: 1000;
+        overflow-y: auto;
+        transition: transform 0.3s ease;
+        transform: translateX(-100%);
+    }
+
+    .schedule-container {
+        width: 100%;
+    }
+
+    .container {
+        justify-content: center;
+    }
+
+    .sidebar.active {
+        display: block;
+        transform: translateX(0);
+    }
+
+    #viewSemesterBtn {
+        display: none; /* Hide the semester view button */
+    }
+
 }
