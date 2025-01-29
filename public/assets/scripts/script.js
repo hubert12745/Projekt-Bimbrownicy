@@ -904,6 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
     const hamburgerBtn = document.getElementById('hamburgerBtn');
 
+    // Obsługa otwierania/zamykania sidebaru
     hamburgerBtn.addEventListener('click', () => {
         sidebar.classList.toggle('active');
     });
@@ -913,6 +914,8 @@ document.addEventListener('DOMContentLoaded', () => {
             sidebar.classList.remove('active');
         }
     });
+
+    // Obsługa rozwijanej grupy przycisków
     const toggleBtn = document.getElementById("toggle-btn");
     const buttonGroup = document.querySelector(".button-group");
 
@@ -930,6 +933,44 @@ document.addEventListener('DOMContentLoaded', () => {
             buttonGroup.style.display = "none";
         }
     });
+
+    /***********************************************
+     * FUNKCJE DOSTĘPNOŚCI
+     ***********************************************/
+    const contrastButton = document.getElementById("toggle-contrast");
+    const fontSizeButton = document.getElementById("toggle-font-size");
+
+    // Obsługa trybu wysokiego kontrastu
+    contrastButton.addEventListener("click", function () {
+        document.body.classList.toggle("high-contrast");
+
+        // Zapamiętanie ustawienia w localStorage
+        if (document.body.classList.contains("high-contrast")) {
+            localStorage.setItem("highContrast", "enabled");
+        } else {
+            localStorage.removeItem("highContrast");
+        }
+    });
+
+    // Obsługa powiększania czcionki
+    fontSizeButton.addEventListener("click", function () {
+        document.body.classList.toggle("large-font");
+
+        // Zapamiętanie ustawienia w localStorage
+        if (document.body.classList.contains("large-font")) {
+            localStorage.setItem("largeFont", "enabled");
+        } else {
+            localStorage.removeItem("largeFont");
+        }
+    });
+
+    // Przywrócenie ustawień użytkownika po odświeżeniu strony
+    if (localStorage.getItem("highContrast") === "enabled") {
+        document.body.classList.add("high-contrast");
+    }
+    if (localStorage.getItem("largeFont") === "enabled") {
+        document.body.classList.add("large-font");
+    }
 
     // Walidacje w czasie rzeczywistym
     const filtersToValidate = [
