@@ -25,9 +25,10 @@ class Student
         $stmt = $pdo->prepare('SELECT student_id FROM Student WHERE student_id = :student_id');
         $stmt->execute(['student_id' => $studentId]);
         $student = $stmt->fetch(\PDO::FETCH_ASSOC);
-
+        $start = '2024-10-1';
+        $end = '2025-02-15';
         if($student === false) {
-            $apiUrl = "https://plan.zut.edu.pl/schedule_student.php?number={$studentId}&start=2025-01-20&end=2025-01-27";
+            $apiUrl = "https://plan.zut.edu.pl/schedule_student.php?number={$studentId}&start={$start}&end={$end}";
             $apiResponse = file_get_contents($apiUrl);
             $studentData = json_decode($apiResponse, true);
             foreach ($studentData as $object) {
