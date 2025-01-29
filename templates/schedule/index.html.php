@@ -188,6 +188,10 @@ ob_start(); ?>
                 <span class="dot egzamin"></span> egzamin
             </div>
         </div> <!-- .main -->
+        <div class="accessibility-controls">
+            <button id="toggle-contrast" class="accessibility-button">Wysoki kontrast</button>
+            <button id="toggle-font-size" class="accessibility-button">Większa czcionka</button>
+        </div>
 
     </div> <!-- .container -->
 

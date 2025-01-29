@@ -388,7 +388,7 @@ button:disabled {
     right: 2px;
     padding: 3px 6px;
     color: #fff;
-    font-size: 12px;
+    font-size: 16px;
     border-radius: 3px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.2);
     overflow: hidden;
@@ -440,13 +440,16 @@ button:disabled {
 ========================================= */
 .month-table {
     width: 100%;
+    height: 100%;
     border-collapse: collapse;
     table-layout: fixed; /* wszystkie kolumny równej szerokości */
     background-color: #d0d8d4;
+
 }
 
 .month-table thead th {
     background-color: #a5b4ac;
+    height: 3%;
     text-align: center;
     font-weight: bold;
     padding: 8px;
@@ -559,7 +562,7 @@ button:disabled {
 }
 
 .semester-month-block {
-    width: 280px;  /* np. większa szerokość */
+    width: 400px;  /* np. większa szerokość */
     border: 1px solid #ddd;
     margin: 10px;
     background-color: white;
@@ -731,6 +734,138 @@ button:disabled {
 input::placeholder {
     color: #A3A3A3;
 }
+.high-contrast .todayHighlight {
+    background-color: yellow;
+}
+
+/* 🟡 Kalendarz w trybie kontrastu - poprawione */
+.high-contrast .calendar-container,
+.high-contrast .calendar-table, {
+    background-color: black !important;
+    color: yellow !important;
+    border-color: white !important;
+}
+
+/* 🟡 Kalendarz okienko (np. datepicker) */
+.high-contrast .calendar-container input,
+.high-contrast .calendar-container select {
+    background-color: black !important;
+    color: yellow !important;
+    border: 1px solid white !important;
+}
+
+/* ==========================
+   TRYB WYSOKIEGO KONTRASTU
+========================== */
+.high-contrast {
+    background-color: black !important;
+    color: yellow !important;
+}
+
+/* 🟡 Wszystkie kontenery na czarno */
+.high-contrast .container,
+.high-contrast .schedule-container,
+.high-contrast .sidebar,
+.high-contrast .filters,
+.high-contrast .legend {
+    background-color: black !important;
+    color: yellow !important;
+    border-color: white !important;
+}
+
+/* 🟡 Tabela */
+.high-contrast .schedule-table thead th,
+.high-contrast .schedule-table tbody td {
+    background-color: black !important;
+    color: yellow !important;
+    border-color: white !important;
+}
+
+/* 🟡 Przycisk */
+.high-contrast button {
+    background-color: yellow !important;
+    color: black !important;
+    border: 2px solid white !important;
+}
+
+/* 🟡 Inputy w trybie kontrastu */
+.high-contrast input,
+.high-contrast select {
+    background-color: black !important;
+    color: yellow !important;
+    border: 1px solid white !important;
+}
+
+.high-contrast .semester-month-block h3 {
+    background-color: black !important;
+}
+
+.high-contrast .semester-month-block {
+    background-color: black !important;
+}
+
+.high-contrast .month-table th,
+.high-contrast .month-table td,
+.high-contrast .semester-month-table th{
+    background-color: black !important;
+}
+
+
+.high-contrast .se
+
+
+    /* ==========================
+       WIĘKSZA CZCIONKA
+    ========================== */
+.large-font {
+    font-size: 18px !important;
+}
+
+.large-font button {
+    font-size: 20px !important;
+}
+
+.large-font .schedule-table thead th,
+.large-font .schedule-table tbody td {
+    font-size: 18px !important;
+}
+
+.large-font .nav-button,
+.large-font .view-button {
+    font-size: 20px !important;
+}
+
+/* ==========================
+   STYL PRZYCISKÓW DOSTĘPNOŚCI
+========================== */
+.accessibility-controls {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    gap: 5px;
+}
+
+.accessibility-button {
+    margin: 5px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    background-color: #333;
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+.accessibility-button:hover {
+    background-color: #555;
+}
+
 
 
 /* =========================================
@@ -888,7 +1023,7 @@ input::placeholder {
         justify-content: center;
         position: fixed;
         bottom: 10px; /* Position at the bottom */
-        right: 10px;   /* Adjust left position as needed */
+        left: 10px;   /* Adjust left position as needed */
         z-index: 1100;
         background: #333;
         color: white;
