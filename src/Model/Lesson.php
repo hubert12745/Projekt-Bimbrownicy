@@ -7,7 +7,6 @@ use PDO;
 
 class Lesson
 {
-    private ?int $lesson_id;
     private ?int $subject_id;
     private ?int $worker_id;
     private ?int $group_id;
@@ -16,20 +15,8 @@ class Lesson
     private ?string $lesson_form;
     private ?string $lesson_form_short;
     private ?string $lesson_status;
-    private ?string $lesson_status_short;
     private ?string $lesson_start;
     private ?string $lesson_end;
-
-    public function getLessonId(): ?int
-    {
-        return $this->lesson_id;
-    }
-
-    public function setLessonId(?int $lesson_id): Lesson
-    {
-        $this->lesson_id = $lesson_id;
-        return $this;
-    }
 
     public function getSubjectId(): ?int
     {
@@ -119,16 +106,6 @@ class Lesson
         return $this;
     }
 
-    public function getLessonStatusShort(): ?string
-    {
-        return $this->lesson_status_short;
-    }
-
-    public function setLessonStatusShort(?string $lesson_status_short): Lesson
-    {
-        $this->lesson_status_short = $lesson_status_short;
-        return $this;
-    }
 
     public function getLessonStart(): ?string
     {
@@ -152,6 +129,99 @@ class Lesson
         return $this;
     }
 
+    public function findByFilters($filters): array
+    {
+        $pdo = new PDO(
+            Config::get('db_dsn'),
+            Config::get('db_user'),
+            Config::get('db_pass')
+        );
+
+        $query = "SELECT * FROM Lesson WHERE 1=1";
+
+        if ($filters['faculty']) {
+            $query .= " AND group_id IN (SELECT group_id FROM ClassGroup WHERE faculty_id IN (SELECT faculty_id FROM Faculty WHERE faculty_name LIKE :faculty))";
+        }
+        if ($filters['lecturer']) {
+            $query .= " AND worker_id IN (SELECT worker_id FROM Worker WHERE full_name LIKE :lecturer)";
+        }
+        if ($filters['room']) {
+            $query .= " AND room_id IN (SELECT room_id FROM Room WHERE room_name LIKE :room)";
+        }
+        if ($filters['subject']) {
+            $query .= " AND subject_id IN (SELECT subject_id FROM Subject WHERE subject_name LIKE :subject)";
+        }
+        if ($filters['group']) {
+            $query .= " AND group_id IN (SELECT group_id FROM ClassGroup WHERE group_name LIKE :group)";
+        }
+        if ($filters['form']) {
+            $query .= " AND lesson_form LIKE :form";
+        }
+        if ($filters['studyType']) {
+            $query .= " AND group_id IN (SELECT group_id FROM ClassGroup WHERE type_of_study LIKE :studyType)";
+        }
+        if ($filters['semester']) {
+            $query .= " AND group_id IN (SELECT group_id FROM ClassGroup WHERE semester LIKE :semester)";
+        }
+        if ($filters['year']) {
+            $query .= " AND group_id IN (SELECT group_id FROM ClassGroup WHERE year LIKE :year)";
+        }
+        if ($filters['studentId']) {
+            $query .= " AND group_id IN (SELECT group_id FROM ClassGroup WHERE group_id IN (SELECT group_id FROM StudentGroup WHERE student_id LIKE :studentId))";
+        }
+        if ($filters['startDate']) {
+            $query .= " AND lesson_start >= :startDate";
+        }
+        if ($filters['endDate']) {
+            $query .= " AND lesson_end <= :endDate";
+        }
+
+        $stmt = $pdo->prepare($query);
+
+        foreach ($filters as $key => $value) {
+            if ($value) {
+                if ($key === 'startDate' || $key === 'endDate') {
+                    $stmt->bindValue(":$key", $value);
+                } else {
+                    $stmt->bindValue(":$key", "%$value%");
+                }
+            }
+        }
+
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $lessons = [];
+        foreach ($results as $result) {
+            $this->setSubjectId($result['subject_id']);
+            $this->setWorkerId($result['worker_id']);
+            $this->setGroupId($result['group_id']);
+            $this->setRoomId($result['room_id']);
+            $this->setLessonDescription($result['lesson_description']);
+            $this->setLessonForm($result['lesson_form']);
+            $this->setLessonFormShort($result['lesson_form_short']);
+            $this->setLessonStatus($result['lesson_status']);
+            $this->setLessonStart($result['lesson_start']);
+            $this->setLessonEnd($result['lesson_end']);
+            $lessons[] = $this->getFields();
+        }
+        return $lessons;
+    }
+    public function getFields(): array
+    {
+        return [
+            'subject_id' => $this->subject_id,
+            'worker_id' => $this->worker_id,
+            'group_id' => $this->group_id,
+            'room_id' => $this->room_id,
+            'lesson_description' => $this->lesson_description,
+            'lesson_form' => $this->lesson_form,
+            'lesson_form_short' => $this->lesson_form_short,
+            'lesson_status' => $this->lesson_status,
+            'lesson_start' => $this->lesson_start,
+            'lesson_end' => $this->lesson_end
+        ];
+    }
     private function findId(
         string $tableName,
         string $whereColumn,

@@ -1,6 +1,5 @@
 <?php
 namespace App\Model;
-require_once __DIR__ . '/../Service/Config.php';
 use PDO;
 use App\Service\Config;
 

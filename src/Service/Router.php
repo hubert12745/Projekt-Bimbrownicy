@@ -39,3 +39,4 @@ $router->addRoute('schedule-show', '/schedule/{id}', [\App\Controller\ScheduleCo
 $router->addRoute('schedule-create', '/schedule/create', [\App\Controller\ScheduleController::class, 'createAction']);
 $router->addRoute('schedule-edit', '/schedule/{id}/edit', [\App\Controller\ScheduleController::class, 'editAction']);
 $router->addRoute('schedule-delete', '/schedule/{id}/delete', [\App\Controller\ScheduleController::class, 'deleteAction']);
+$router->addRoute('api-schedule', '/api/schedule', [\App\Controller\ApiController::class, 'scheduleAction']);

@@ -59,7 +59,6 @@ CREATE TABLE ClassGroup
 
 CREATE TABLE Lesson
 (
-    lesson_id           INTEGER PRIMARY KEY AUTOINCREMENT,
     subject_id          INTEGER ,
     worker_id           INTEGER ,
     group_id            INTEGER ,
@@ -70,6 +69,7 @@ CREATE TABLE Lesson
     lesson_status       TEXT ,
     lesson_start        TEXT ,
     lesson_end          TEXT ,
+    PRIMARY KEY (subject_id, worker_id, group_id, room_id, lesson_start, lesson_end),
     FOREIGN KEY (subject_id) REFERENCES Subject (subject_id),
     FOREIGN KEY (worker_id) REFERENCES Worker (worker_id),
     FOREIGN KEY (group_id) REFERENCES ClassGroup (group_id),

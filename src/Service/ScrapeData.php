@@ -6,10 +6,8 @@ use App\Model\Lesson;
 use App\Model\Subject;
 use App\Model\Worker;
 use App\Model\ClassGroup;
-use App\Model\Student;
 use App\Model\Room;
 use App\Model\Faculty;
-use App\Model\StudentGroup;
 
 class ScrapeData
 {
@@ -53,14 +51,5 @@ class ScrapeData
             $lesson = Lesson::fromApi($object);
             $lesson->save();
         }
-//        if (isset($object['student_id'])) {
-//            $studentId = Student::fromApi($object);
-//            $studentId->save($studentId->getStudentId());
-//        }
-//
-//        if (isset($object['student_id']) && isset($object['group_id'])) {
-//            $studentGroup = StudentGroup::fromApi($object);
-//            $studentGroup->save($studentGroup->getStudentId(), $studentGroup->getGroupId());
-//        }
     }
 }
